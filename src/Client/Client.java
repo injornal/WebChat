@@ -1,5 +1,7 @@
 package Client;
 
+import org.json.JSONObject;
+
 import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -7,6 +9,7 @@ import java.util.ArrayList;
 public class Client {
     private PrintWriter writer;
     private BufferedReader reader;
+    private String token;
 
     protected void start(String ip, int port) {
         try (Socket socket = new Socket(ip, port)) {
@@ -17,8 +20,44 @@ public class Client {
         }
     }
 
+    /**
+     * Logs in a user
+     * Sets the token field which allows the other requests
+     * @param username user's username
+     * @param password user's password
+     * @return token or null if exception
+     */
+    protected String login(String username, String password) throws IOException {
+        JSONObject login = new JSONObject();
+        login.put("action", "LOGIN");
+        login.put("username", username);
+        login.put("password", password);
+        writer.println(login.toString());
+        return reader.readLine();
+    }
+
+    /**
+     * Return all the chats available for that person
+     * @return the chats the user has
+     */
     protected ArrayList<Chat> getChats () {
         return null; // TODO getChats
+    }
+
+    protected ArrayList<Message> getMessages(Chat chat) {
+        return null; // TODO getMessages
+    }
+
+    protected ArrayList<Message> getNewMessages(Chat chat) {
+        return null; // TODO getNewMessages
+    }
+
+    protected void sendMessage() throws IOException {
+        // TODO sendMessage
+    }
+
+    protected void startChat() {
+        // TODO startChat
     }
 
     public static void main(String[] args) throws java.io.IOException{

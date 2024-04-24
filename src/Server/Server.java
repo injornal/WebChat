@@ -8,6 +8,27 @@ import java.util.TreeMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+/**
+ * A server for WebChat. To run, call start().
+ * Protocol:
+ * API is implemented using JSON objects
+ * Each request must contain fields "action", "token", and "parameters"
+ * with a sub-map of parameters
+ * Possible actions:
+ * 1. SIGN_UP (token should be empty)
+ * parameters: username, password
+ * creates a user on the server
+ * 2. LOGIN (token should be empty)
+ * parameters: username, password
+ * returns a string token which shall be used until LOGOUT is called
+ * 3. LOGOUT
+ * resets the token, closes the connection
+ * 4. GET_ALL
+ * returns a JSONArray of all messages
+ * see message signature in the Message class header
+ * 5. SEND
+ * parameters: receiver, message
+ */
 public class Server {
     private boolean running;
     private int port;
@@ -27,7 +48,7 @@ public class Server {
 
     public void start(int port) throws java.io.IOException {
         this.port = port;
-        introduce();
+        this.introduce();
         this.running = true;
         try (ServerSocket serverSocket = new ServerSocket(port)) {
             while (running) {

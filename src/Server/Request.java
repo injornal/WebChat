@@ -4,7 +4,7 @@ public class Request {
     private String[] data;
 
     public enum Type {
-        GET_ALL, GET_UNREAD, SEND, LOGIN, SIGNUP, LOGOUT
+        GET_ALL, SEND, LOGIN, SIGNUP, LOGOUT
     }
 
     Type type;
@@ -13,7 +13,6 @@ public class Request {
         this.data = req.split(" ");
         this.type = switch (data[0]) {
             case "GET_ALL" -> this.type = Type.GET_ALL;
-            case "GET_UNREAD" -> Type.GET_UNREAD;
             case "SEND" -> Type.SEND;
             case "LOGIN" -> Type.LOGIN;
             case "SIGNUP" -> Type.SIGNUP;

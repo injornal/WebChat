@@ -43,17 +43,12 @@ class ServerConnection implements Runnable {
                 this.signUp(request.getData()) ? "SUCCESS" : "ERROR USER_DOES_NOT_EXIST";
             case LOGOUT -> this.isLoggedIn() ? this.logout() ? "SUCCESS" : "ERROR" : "ERROR NOT_LOGGED_IN";
             case GET_ALL -> this.isLoggedIn() ? this.getAllMessages().toString() : "ERROR NOT_LOGGED_IN";
-            case GET_UNREAD -> this.isLoggedIn() ? this.getUnreadMessages().toString() : "ERROR NOT_LOGGED_IN";
             case SEND -> this.isLoggedIn() ? this.sendMessage(request.getData()) ? "SUCCESS" : "ERROR" : "ERROR NOT_LOGGED_IN";
         };
     }
 
     private JSONArray getAllMessages() {
         return this.user.getAllMessages();
-    }
-
-    private JSONArray getUnreadMessages() {
-        return this.user.getUnreadMessages();
     }
 
     private boolean sendMessage(String[] data) {
