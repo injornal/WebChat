@@ -1,45 +1,39 @@
 package Server;
 
-import java.util.ArrayList;
-import java.util.Map;
 import java.util.TreeMap;
 
-import org.json.JSONArray;
+class User implements Comparable<User>{
+    private String username;
+    private String password;
+    private ServerConnection connection;
 
-public class User {
-    private final String username;
-    private ArrayList<Message> messages;
-    private final Password password;
-
-    protected User(String username, String password) {
+    protected User (String username, String password) {
         this.username = username;
-        this.messages = new ArrayList<>();
-        this.password = new Password(password);
+        this.password = password;
     }
 
-    public void receiveMessage(Message message) {
-        messages.add(message);
+    protected void receiveMessage(Message message, Chat chat) { // TODO fix if connected
+        this.connection.receiveMessage(message, chat);
     }
 
-    public JSONArray getAllMessages() {
-        ArrayList<Message> messagesList = this.messages;
-        ArrayList<Map<String, String>> messageMapList = new ArrayList<>();
-        for (Message msg : messagesList) {
-            messageMapList.add(msg.toMap());
-        }
-        return new JSONArray(messageMapList);
+    protected String getPassword() {
+        return this.password;
     }
 
-    public boolean login(String password) {
-        return this.password.equals(new Password(password));
-    }
-
-    @Override
-    public String toString() {
+    protected String getUsername() {
         return this.username;
     }
 
-    public String getUsername() {
-        return username;
+    protected void connect(ServerConnection connection) {
+        this.connection = connection;
+    }
+
+    protected void disconnect() {
+        this.connection = null;
+    }
+
+    @Override
+    public int compareTo(User user) {
+        return this.username.compareTo(user.getUsername());
     }
 }

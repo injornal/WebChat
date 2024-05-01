@@ -1,33 +1,19 @@
 package Server;
 
-import java.util.Map;
-import java.util.TreeMap;
+import org.json.JSONObject;
 
-public class Message {
-    User sender;
-    User receiver;
-    String message;
+class Message {
+    private final String content;
+    private final String sender;
+    private final String timeStamp;
 
-    public Message(User sender, User receiver, String message) {
+    protected Message(String content, String sender, String timeStamp) {
+        this.content = content;
         this.sender = sender;
-        this.receiver = receiver;
-        this.message = message;
+        this.timeStamp = timeStamp;
     }
 
-    public void send() {
-        this.receiver.receiveMessage(this);
-    }
-
-    @Override
-    public String toString() {
-        return this.sender + " " + this.receiver + " " + this.message;
-    }
-
-    public Map<String, String> toMap() {
-        Map<String, String> msgMap = new TreeMap<String, String>();
-        msgMap.put("sender", this.sender.getUsername());
-        msgMap.put("receiver", this.receiver.getUsername());
-        msgMap.put("message", this.message);
-        return msgMap;
+    public JSONObject toJSON() {
+        return new JSONObject().put("content", content).put("sender", sender).put("time_stamp", this.timeStamp);
     }
 }

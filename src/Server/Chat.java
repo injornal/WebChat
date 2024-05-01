@@ -1,9 +1,19 @@
 package Server;
 
-public class Chat {
-    private final int id;
+import java.util.TreeSet;
+
+class Chat {
+    private TreeSet<User> users;
 
     protected Chat() {
-        this.id = 1;
+        this.users = new TreeSet<>();
+    }
+
+    public TreeSet<User> getUsers() {
+        return users;
+    }
+
+    public void join(User user) {
+        this.users.add(user);
     }
 }
