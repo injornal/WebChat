@@ -1,11 +1,13 @@
 package App.Networking;
 
 import App.Message;
+import App.Chat;
 import org.json.JSONObject;
 
 import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
+import org.json.JSONObject;
 
 // TODO Add a separate thread which will read messages continuously and write them into chats.
 
@@ -18,8 +20,13 @@ public class Client implements AutoCloseable {
     private ArrayList<MessageReceiver> receivers;
 
 
+    /**
+     * Start the client
+     * Connects to the server at the given ip and port
+     * @param ip server ip
+     * @param port server port
+     */
     public void start(String ip, int port) {
-        this.username = username;
         try {
             this.socket = new Socket(ip, port);
             this.writer = new PrintWriter(socket.getOutputStream(), true);
@@ -34,25 +41,51 @@ public class Client implements AutoCloseable {
         this.socket.close();
     }
 
+    /**
+     * Registers a new user
+     * @param username user's username
+     * @param password user's password
+     * @return true if success, false otherwise
+     */
+    public boolean sign_up(String username, String password) {
+        return true;
+    }
 
-    public Response sign_up(String username, String password) {
+    /**
+     * Logs a new user in
+     * @param username user's username
+     * @param password user's password
+     * @return true if success, false otherwise
+     */
+    public boolean login(String username, String password) {
+        return true;
+    }
+
+    /**
+     * Creates a new chat
+     * @return a Chat instance if success, null otherwise
+     */
+    public Chat createChat() {
         return null;
     }
 
-    public Response login(String username, String password) {
-        return null;
+    /**
+     * Joins the user to a chat with a given chat_id
+     * @param chat_id id of the chat
+     * @return true if success, false otherwise
+     */
+    public boolean joinChat(int chat_id) {
+        return true;
     }
 
-    public Response createChat() {
-        return null;
-    }
-
-    public Response joinChat(int chat_id) {
-        return null;
-    }
-
-    public Response sendMessage(Message message, int chat_id) {
-        return null;
+    /**
+     * Sends a message into a chat
+     * @param message message to send
+     * @param chat_id id of the chat
+     * @return true if success, false otherwise
+     */
+    public boolean sendMessage(Message message, int chat_id) {
+        return true;
     }
 
     public static void test() {
