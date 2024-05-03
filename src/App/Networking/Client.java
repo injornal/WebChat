@@ -1,5 +1,6 @@
-package Client;
+package App.Networking;
 
+import App.Message;
 import org.json.JSONObject;
 
 import java.io.*;
@@ -14,9 +15,10 @@ public class Client implements AutoCloseable {
     private BufferedReader reader;
     private Socket socket;
     private String username;
-    ArrayList<Message> history = new ArrayList<>();
+    private ArrayList<MessageReceiver> receivers;
 
-    protected void start(String ip, int port, String username) {
+
+    public void start(String ip, int port) {
         this.username = username;
         try {
             this.socket = new Socket(ip, port);
@@ -32,21 +34,42 @@ public class Client implements AutoCloseable {
         this.socket.close();
     }
 
-    public static void main(String[] args) {
+
+    public Response sign_up(String username, String password) {
+        return null;
+    }
+
+    public Response login(String username, String password) {
+        return null;
+    }
+
+    public Response createChat() {
+        return null;
+    }
+
+    public Response joinChat(int chat_id) {
+        return null;
+    }
+
+    public Response sendMessage(Message message, int chat_id) {
+        return null;
+    }
+
+    public static void test() {
         try (Client connie = new Client()) {
-            connie.start("127.0.0.1", 8080, "Connie");
-            connie.writer.println(new JSONObject().put("action", "SIGN_UP").put("username", connie.username).put("password", "1234"));
+            connie.start("127.0.0.1", 8080);
+            connie.writer.println(new JSONObject().put("action", "SIGN_UP").put("username", "Connie").put("password", "1234"));
             System.out.println(connie.reader.readLine());
-            connie.writer.println(new JSONObject().put("action", "LOGIN").put("username", connie.username).put("password", "1234"));
+            connie.writer.println(new JSONObject().put("action", "LOGIN").put("username", "Connie").put("password", "1234"));
             System.out.println(connie.reader.readLine());
             connie.writer.println(new JSONObject().put("action", "CREATE_CHAT"));
             System.out.println(connie.reader.readLine());
             int chat_id = 0;
             try (Client ivan = new Client()) {
-                ivan.start("127.0.0.1", 8080, "Ivan");
-                ivan.writer.println(new JSONObject().put("action", "SIGN_UP").put("username", ivan.username).put("password", "1234"));
+                ivan.start("127.0.0.1", 8080);
+                ivan.writer.println(new JSONObject().put("action", "SIGN_UP").put("username", "Ivan").put("password", "1234"));
                 System.out.println(ivan.reader.readLine());
-                ivan.writer.println(new JSONObject().put("action", "LOGIN").put("username", ivan.username).put("password", "1234"));
+                ivan.writer.println(new JSONObject().put("action", "LOGIN").put("username", "Ivan").put("password", "1234"));
                 System.out.println(ivan.reader.readLine());
                 ivan.writer.println(new JSONObject().put("action", "JOIN_CHAT").put("chat_id", chat_id));
                 System.out.println(ivan.reader.readLine());
