@@ -13,7 +13,7 @@ class Chat {
         return users;
     }
 
-    public void join(User user) {
+    synchronized public void join(User user) {
         this.users.add(user);
     }
 }

@@ -9,23 +9,13 @@ import java.io.PrintWriter;
 import java.net.Socket;
 
 
-/**
- * Protocol
- * 1. SIGN_UP username password
- * 2. LOGIN username password
- * 3. JOIN_CHAT chat_id
- * 4. CREATE_CHAT
- *  return chat_id
- *  joins the chat automatically
- * 5. SEND content sender time_stamp chat_id
- */
 class ServerConnection implements Runnable {
-    private PrintWriter writer;
-    private BufferedReader reader;
-    private Socket conn;
+    private final PrintWriter writer;
+    private final BufferedReader reader;
+    private final Socket conn;
     private User user;
 
-    ServerConnection(Socket conn) throws java.io.IOException{
+    ServerConnection(Socket conn) throws java.io.IOException {
         this.conn = conn;
         this.writer = new PrintWriter(conn.getOutputStream(), true);
         this.reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
@@ -39,80 +29,96 @@ class ServerConnection implements Runnable {
                 if (data == null)
                     break;
                 System.out.println(data);
-                this.execute(data);
+                writer.println(this.execute(data));
             }
         } catch (IOException e) {
+            this.user.disconnect();
             throw new RuntimeException(e);
         }
     }
 
-    private void execute(String data) {
+    private JSONObject execute(String data) {
         JSONObject dataJSON = new JSONObject(data);
-        switch (dataJSON.getString("action")) {
-            case "SEND":
-                this.sendMessage(new Message(dataJSON.getString("content"), dataJSON.getString("sender"),
-                        dataJSON.getString("time_stamp")), Server.chats.get(dataJSON.getInt("chat_id")));
-                break;
-            case "SIGN_UP":
-                this.signUp(dataJSON);
-                break;
-            case "LOGIN":
-                this.login(dataJSON);
-                break;
-            case "CREATE_CHAT":
-                this.createChat();
-                break;
-            case "JOIN_CHAT":
-                this.joinChat(dataJSON.getInt("chat_id"));
-                break;
-        }
+        JSONObject result = switch (dataJSON.getString("action")) {
+            case "SEND" -> this.sendMessage(dataJSON);
+            case "SIGN_UP" -> this.signUp(dataJSON);
+            case "LOGIN" -> this.login(dataJSON);
+            case "CREATE_CHAT" -> this.createChat();
+            case "JOIN_CHAT" -> this.joinChat(dataJSON.getInt("chat_id"));
+            default -> new JSONObject().put("result", "EXCEPTION").put("message", "WRONG_ACTION");
+        };
+        return result.put("action", dataJSON.getString("action"));
     }
 
-    private void createChat() {
+    private JSONObject createChat() {
+        if (isNotLoggedIn()) return new JSONObject().put("result", "ERROR").put("message", "NOT_LOGGED_IN");
         Chat chat = new Chat();
         Server.chats.add(chat);
         this.joinChat(chat);
-        writer.println(new JSONObject().put("chat_id", Server.chats.indexOf(chat))); // TODO think about the structure to reduce O(N) calls
+        int chat_id;
+        chat_id = Server.chats.indexOf(chat);
+        return new JSONObject().put("result", "SUCCESS").put("chat_id", chat_id);
+        // TODO think about the structure to reduce O(N) calls
     }
 
-    private void joinChat(int chat_id) {
-        this.joinChat(Server.chats.get(chat_id));
+    private JSONObject joinChat(int chat_id) {
+        if (isNotLoggedIn()) return new JSONObject().put("result", "ERROR").put("message", "NOT_LOGGED_IN");
+        return this.joinChat(Server.chats.get(chat_id));
     }
 
-    private void joinChat(Chat chat) {
+    private JSONObject joinChat(Chat chat) {
+        if (isNotLoggedIn()) return new JSONObject().put("result", "ERROR").put("message", "NOT_LOGGED_IN");
+        if (chat == null)
+            return new JSONObject().put("result", "ERROR").put("message", "CHAT_DOES_NOT_EXIST");
         chat.join(this.user);
+        return new JSONObject().put("result", "SUCCESS");
     }
 
-    private void sendMessage(Message message, Chat chat) {
+    private JSONObject sendMessage(JSONObject data) {
+        Chat chat = Server.chats.get(data.getInt("chat_id"));
+        if (chat == null) return new JSONObject().put("result", "ERROR").put("message", "CHAT_DOES_NOT_EXIST");
+        if (isNotLoggedIn()) return new JSONObject().put("result", "ERROR").put("message", "NOT_LOGGED_IN");
+        Message message = new Message(
+                data.getString("content"), this.user.getUsername(), data.getString("time_stamp")
+        );
         for (User user : chat.getUsers()) {
-            user.receiveMessage(message, chat);
+            if (user != this.user) user.receiveMessage(message, chat);
         }
+        return new JSONObject().put("result", "SUCCESS");
     }
 
-    public void receiveMessage(Message message, Chat chat) { // TODO think about the multithreading part
-        writer.println(message.toJSON().put("chat_id", Server.chats.indexOf(chat)));
+    public void receiveMessage(Message message, Chat chat) {
+        writer.println(message.toJSON().put("action", "RECEIVE_MESSAGE").put("result", "SUCCESS")
+                .put("chat_id", Server.chats.indexOf(chat)));
     }
 
-    private void signUp(JSONObject data) {
+    private JSONObject signUp(JSONObject data) {
         String username = data.getString("username");
         String password = data.getString("password");
         if (Server.users.containsKey(username)) {
-            writer.println("ERROR USER_ALREADY_EXISTS");
-            return;
+            return new JSONObject().put("result", "ERROR").put("message", "USER_ALREADY_EXISTS");
         }
         User user = new User(username, password);
         Server.users.put(username, user);
+        return new JSONObject().put("result", "SUCCESS");
     }
 
-    private void login(JSONObject data) {
+    private JSONObject login(JSONObject data) {
         String username = data.getString("username");
+        User user;
         if (Server.users.containsKey(username)) {
-            User user = Server.users.get(username);
-            if (user.getPassword().equals(data.getString("password"))) {
-                this.user = user;
-                this.user.connect(this);
-            } else writer.println("ERROR WRONG_PASSWORD");
+            user = Server.users.get(username);
+        } else {
+            return new JSONObject().put("result", "ERROR").put("message", "USER_DOES_NOT_EXIST");
         }
-        else writer.println("ERROR USER_DOES_NOT_EXIST");
+        if (user.getPassword().equals(data.getString("password"))) {
+            this.user = user;
+            this.user.connect(this);
+        } else return new JSONObject().put("result", "ERROR").put("message", "WRONG_PASSWORD");
+        return new JSONObject().put("result", "SUCCESS");
+    }
+
+    private boolean isNotLoggedIn() {
+        return this.user == null;
     }
 }

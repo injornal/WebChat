@@ -12,9 +12,9 @@ import java.util.concurrent.Executors;
 class Server {
     private boolean running;
     private int port;
-    protected static TreeMap<String, User> users = new TreeMap<>();
+    protected static final TreeMap<String, User> users = new TreeMap<>();
     private final ExecutorService service;
-    protected static ArrayList<Chat> chats = new ArrayList<>();
+    protected static final ArrayList<Chat> chats = new ArrayList<>();
 
     Server() {
         service = Executors.newCachedThreadPool();
