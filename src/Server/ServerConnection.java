@@ -15,10 +15,14 @@ class ServerConnection implements Runnable {
     private final Socket conn;
     private User user;
 
-    ServerConnection(Socket conn) throws java.io.IOException {
-        this.conn = conn;
-        this.writer = new PrintWriter(conn.getOutputStream(), true);
-        this.reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+    ServerConnection(Socket conn) {
+        try {
+            this.conn = conn;
+            this.writer = new PrintWriter(conn.getOutputStream(), true);
+            this.reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
@@ -29,10 +33,13 @@ class ServerConnection implements Runnable {
                 if (data == null)
                     break;
                 System.out.println(data);
-                writer.println(this.execute(data));
+                JSONObject response = this.execute(data);
+                this.writer.println(response);
+                System.out.println(response);
             }
-        } catch (IOException e) {
-            this.user.disconnect();
+        } catch (Exception e) {
+            if (this.user != null) this.user.disconnect();
+            this.user = null;
             throw new RuntimeException(e);
         }
     }
@@ -75,6 +82,7 @@ class ServerConnection implements Runnable {
     }
 
     private JSONObject sendMessage(JSONObject data) {
+        if (Server.chats.isEmpty()) return new JSONObject().put("result", "ERROR").put("message", "CHAT_DOES_NOT_EXIST");
         Chat chat = Server.chats.get(data.getInt("chat_id"));
         if (chat == null) return new JSONObject().put("result", "ERROR").put("message", "CHAT_DOES_NOT_EXIST");
         if (isNotLoggedIn()) return new JSONObject().put("result", "ERROR").put("message", "NOT_LOGGED_IN");
@@ -88,7 +96,7 @@ class ServerConnection implements Runnable {
     }
 
     public void receiveMessage(Message message, Chat chat) {
-        writer.println(message.toJSON().put("action", "RECEIVE_MESSAGE").put("result", "SUCCESS")
+        writer.println(message.toJSON().put("action", "RECEIVE")
                 .put("chat_id", Server.chats.indexOf(chat)));
     }
 
