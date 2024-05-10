@@ -50,9 +50,18 @@ public class MessengerWindow implements ActionListener{
         frame.pack();
         frame.setVisible(true);
     }
-    public static void main(String[] args) {
+
+    public void displayLogin(){
         new MessengerWindow();
     }
+
+    public void displayListOfChats(){
+        
+    }
+    public static void main(String[] args) {
+        MessengerWindow m = new MessengerWindow();
+        m.displayLogin();
+    } 
     @Override
     public void actionPerformed(ActionEvent e) {
         String u = user.getText();
