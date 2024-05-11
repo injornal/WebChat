@@ -12,8 +12,9 @@ class User implements Comparable<User>{
         this.password = password;
     }
 
-    protected void receiveMessage(Message message, Chat chat) { // TODO fix if connected
-        this.connection.receiveMessage(message, chat);
+    protected void receiveMessage(Message message, Chat chat) {
+        if (this.connection != null)
+            this.connection.receiveMessage(message, chat);
     }
 
     protected String getPassword() {

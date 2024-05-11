@@ -38,6 +38,11 @@ class ServerConnection implements Runnable {
                 System.out.println(response);
             }
         } catch (Exception e) {
+            try {
+                conn.close();
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
             if (this.user != null) this.user.disconnect();
             this.user = null;
             throw new RuntimeException(e);
