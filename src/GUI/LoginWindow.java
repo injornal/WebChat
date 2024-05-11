@@ -15,26 +15,25 @@ import javax.swing.JPasswordField;
 
 import App.Networking.Client;
 
-public class Login extends JFrame {
+public class LoginWindow extends JFrame {
     private JPanel panel;
-    //private MessengerWindow window;
-
     private JTextField user;
     private JPasswordField pass;
     private JButton loginButton;
-
     private App.Networking.Client client;
 
-    public Login() {
+    public LoginWindow(Client client) {
+        this.client = client;
+        client.start("127.0.0.1", 8080);
+
         user = new JTextField();
         pass = new JPasswordField();
-        loginButton = new JButton("login");
-        JButton signupButton = new JButton("sign up");
-        loginButton.addActionListener(new loginButton(this));
-        signupButton.addActionListener(new signupButton(this));
-
-        JLabel uLabel = new JLabel("username:");
-        JLabel pLabel = new JLabel("password:");
+        loginButton = new JButton("Login");
+        JButton signupButton = new JButton("Sign Up");
+        loginButton.addActionListener(new LoginButton(this));
+        signupButton.addActionListener(new SignupButton(this));
+        JLabel uLabel = new JLabel("Username:");
+        JLabel pLabel = new JLabel("Password:");
 
         panel = new JPanel();
         panel.setBorder(BorderFactory.createEmptyBorder(30,30,10,30));
@@ -53,9 +52,6 @@ public class Login extends JFrame {
         setTitle("WebChat");
         pack();
         setVisible(true);
-
-        client = new Client();
-        client.start("127.0.0.1", 8080);
     }
     private boolean isAlpha(String s) {
         String alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -78,9 +74,9 @@ public class Login extends JFrame {
     private JPasswordField getPassField() {
         return pass;
     }
-    private class loginButton implements ActionListener {
-        private Login frame;
-        public loginButton(Login frame) {
+    private class LoginButton implements ActionListener {
+        private LoginWindow frame;
+        public LoginButton(LoginWindow frame) {
             this.frame = frame;
         }
         public void actionPerformed(ActionEvent e) {
@@ -95,13 +91,12 @@ public class Login extends JFrame {
             {
                 String result = a.getString("result");
                 if (result.equals("SUCCESS")) {
-                    System.out.println("login success");
                     //open chats
+                    //closes this window
                 }
                 else {
-                    System.out.println("login fail");
-                    JOptionPane loginPane = new JOptionPane("login fail");
-                    loginPane.showMessageDialog(null, "login fail");
+                    JOptionPane loginPane = new JOptionPane("Login Fail");
+                    loginPane.showMessageDialog(null, "Login Fail");
                     loginPane.setBorder(BorderFactory.createEmptyBorder(30,30,10,30));
                     frame.getUserField().setText("");
                     frame.getPassField().setText("");
@@ -109,13 +104,12 @@ public class Login extends JFrame {
             });
         }
     }
-    private class signupButton implements ActionListener {
-        private Login frame;
-        public signupButton(Login frame) {
+    private class SignupButton implements ActionListener {
+        private LoginWindow frame;
+        public SignupButton(LoginWindow frame) {
             this.frame = frame;
         }
         public void actionPerformed(ActionEvent e) {
-            JOptionPane signup = new JOptionPane("");
             String u = user.getText();
             String p = "";
             char[] cList = pass.getPassword();
@@ -124,12 +118,12 @@ public class Login extends JFrame {
             }
 
             if (u.length() < 5 || u.length() > 12 || !isAlpha(u)) {
-                JOptionPane invalidUser = new JOptionPane("invalid user");
-                invalidUser.showMessageDialog(null, "invalid user");
+                JOptionPane invalidUser = new JOptionPane("Invalid User");
+                invalidUser.showMessageDialog(null, "Invalid User");
             }
             else if (p.length() < 5 || u.length() > 24) {
-                JOptionPane invalidPassword = new JOptionPane("invalid password");
-                invalidPassword.showMessageDialog(null, "invalid password");
+                JOptionPane invalidPassword = new JOptionPane("Invalid Password");
+                invalidPassword.showMessageDialog(null, "Invalid Password");
             }
             else {
                 client.signUp(u, p);
@@ -137,21 +131,17 @@ public class Login extends JFrame {
                 {
                     String result = a.getString("result");
                     if (result.equals("SUCCESS")) {
-                        System.out.println("signup success");
-                        //open chats
+                        System.out.println("Signup Success");
                     }
                     else {
-                        System.out.println("signup fail");
-                        JOptionPane signupFail = new JOptionPane("user already exists");
-                        signupFail.showMessageDialog(null, "user already exists");
+                        System.out.println("Signup Fail");
+                        JOptionPane signupFail = new JOptionPane("User Already Exists");
+                        signupFail.showMessageDialog(null, "User Already Exists");
                         frame.getUserField().setText("");
                         frame.getPassField().setText("");
                     }
                 });
             }
         }
-    }
-    public static void main(String[] args) {
-        new Login();
     }
 }
