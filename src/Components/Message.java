@@ -1,4 +1,4 @@
-package Components.Message;
+package Components;
 
 public class Message {
     

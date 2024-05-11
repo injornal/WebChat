@@ -1,4 +1,4 @@
-package Components.Message;
+package Components;
 import java.util.*;
 
 public class Chat {
