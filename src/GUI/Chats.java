@@ -12,7 +12,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.JPasswordField;
 
-public class MessengerWindow implements ActionListener{
+public class Chats implements ActionListener{
 
     private JFrame frame;
     private JPanel panel;
@@ -24,7 +24,7 @@ public class MessengerWindow implements ActionListener{
 
     private JButton button;
 
-    public MessengerWindow() {
+    public Chats() {
         JFrame frame = new JFrame();
 
         JTextField user = new JTextField();
@@ -52,14 +52,14 @@ public class MessengerWindow implements ActionListener{
     }
 
     public void displayLogin(){
-        new MessengerWindow();
+        new Chats();
     }
 
     public void displayListOfChats(){
         
     }
     public static void main(String[] args) {
-        MessengerWindow m = new MessengerWindow();
+        Chats m = new Chats();
         m.displayLogin();
     } 
     @Override
