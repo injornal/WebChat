@@ -3,7 +3,7 @@ package Server;
 import java.util.TreeSet;
 
 class Chat {
-    private TreeSet<User> users;
+    private final TreeSet<User> users;
 
     protected Chat() {
         this.users = new TreeSet<>();

@@ -191,6 +191,20 @@ public class Client implements java.io.Closeable {
                 client1.sendMessage("Hello there", "0:00", 0);
                 TimeUnit.SECONDS.sleep(1);
             }
+            client.sendMessage("Hi Ivan", "0:00", 0);
+            TimeUnit.SECONDS.sleep(1);
+        } catch (IOException | InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        try(Client client = new Client()) {
+            client.start("127.0.0.1", 8080);
+            client.addSignUpOnResponseCallback(System.out::println);
+            client.addLoginOnResponseCallback(System.out::println);
+            client.addReceiveMessageCallback(System.out::println);
+            client.addSendMessageOnResponseCallback(System.out::println);
+            client.addCreateChatOnResponseCallback(System.out::println);
+            client.addJoinChatOnResponseCallback(System.out::println);
+            client.login("IVAN", "1234");
             TimeUnit.SECONDS.sleep(1);
         } catch (IOException | InterruptedException e) {
             throw new RuntimeException(e);

@@ -1,20 +1,25 @@
 package Server;
 
-import java.util.TreeMap;
+import java.util.LinkedList;
+import java.util.Queue;
 
 class User implements Comparable<User>{
     private String username;
     private String password;
     private ServerConnection connection;
+    private final Queue<Message> queuedMessages;
 
     protected User (String username, String password) {
         this.username = username;
         this.password = password;
+        queuedMessages = new LinkedList<>();
     }
 
-    protected void receiveMessage(Message message, Chat chat) {
+    protected void receiveMessage(Message message) {
         if (this.connection != null)
-            this.connection.receiveMessage(message, chat);
+            this.connection.receiveMessage(message);
+        else
+            queuedMessages.add(message);
     }
 
     protected String getPassword() {
@@ -26,7 +31,11 @@ class User implements Comparable<User>{
     }
 
     protected void connect(ServerConnection connection) {
+        System.out.println(queuedMessages);
         this.connection = connection;
+        for (Message message: queuedMessages) {
+            this.connection.receiveMessage(message);
+        }
     }
 
     protected void disconnect() {

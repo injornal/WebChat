@@ -37,6 +37,8 @@ class ServerConnection implements Runnable {
                 this.writer.println(response);
                 System.out.println(response);
             }
+            if (this.user != null) this.user.disconnect();
+            this.user = null;
         } catch (Exception e) {
             try {
                 conn.close();
@@ -92,17 +94,17 @@ class ServerConnection implements Runnable {
         if (chat == null) return new JSONObject().put("result", "ERROR").put("message", "CHAT_DOES_NOT_EXIST");
         if (isNotLoggedIn()) return new JSONObject().put("result", "ERROR").put("message", "NOT_LOGGED_IN");
         Message message = new Message(
-                data.getString("content"), this.user.getUsername(), data.getString("time_stamp")
+                data.getString("content"), this.user.getUsername(), data.getString("time_stamp"),
+                data.getInt("chat_id")
         );
         for (User user : chat.getUsers()) {
-            if (user != this.user) user.receiveMessage(message, chat);
+            if (user != this.user) user.receiveMessage(message);
         }
         return new JSONObject().put("result", "SUCCESS");
     }
 
-    public void receiveMessage(Message message, Chat chat) {
-        writer.println(message.toJSON().put("action", "RECEIVE")
-                .put("chat_id", Server.chats.indexOf(chat)));
+    public void receiveMessage(Message message) {
+        writer.println(message.toJSON().put("action", "RECEIVE"));
     }
 
     private JSONObject signUp(JSONObject data) {
