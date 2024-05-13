@@ -38,6 +38,7 @@ public class ChatsWindow extends JFrame {
             // else {
             //     chat = new JButton("New Chat");
             // }
+            
             increment++;
             chat.addActionListener(new ClickChat(this, increment-1));
             panel.add(chat);
