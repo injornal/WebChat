@@ -1,8 +1,7 @@
-package App;
-
+package Server.Components;
+import Server.Components.Person;
 import java.util.*;
 
-import Server.Components.Person;
 
 public class Chat {
     
@@ -14,6 +13,7 @@ public class Chat {
         this.chatID = chatID;
     }
 
+    //new chat no paramters
     public int getChatID(){
         return chatID;
     }
@@ -29,7 +29,7 @@ public class Chat {
     public ArrayList<Message> getMessages(){
         return messages;
     }
-
-
+    //chat.getUsers
+    //chat.joinchat
 
 }

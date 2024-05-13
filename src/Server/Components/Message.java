@@ -2,13 +2,13 @@ package Server.Components;
 
 import org.json.JSONObject;
 
-class Message {
+public class Message {
     private final String content;
     private final String sender;
     private final String timeStamp;
     private final int chatId;
 
-    protected Message(String content, String sender, String timeStamp, int chatId) {
+    public Message(String content, String sender, String timeStamp, int chatId) {
         this.content = content;
         this.sender = sender;
         this.timeStamp = timeStamp;
