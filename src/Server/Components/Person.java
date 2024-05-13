@@ -1,4 +1,4 @@
-package App;
+package Server.Components;
 
 public class Person {
     

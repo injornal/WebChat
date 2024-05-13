@@ -1,4 +1,4 @@
-package Server;
+package Server.Components;
 
 import org.json.JSONObject;
 

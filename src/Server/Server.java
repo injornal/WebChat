@@ -5,6 +5,8 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.*;
 
+import Server.Components.Chat;
+
 
 class Server {
     private boolean running;

@@ -2,6 +2,8 @@ package App;
 
 import java.util.*;
 
+import Server.Components.Person;
+
 public class Chat {
     
     private int chatID;
