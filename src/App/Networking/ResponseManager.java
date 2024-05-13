@@ -5,6 +5,9 @@ import org.json.JSONObject;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.function.Consumer;
 
 public class ResponseManager implements Runnable {
@@ -16,6 +19,13 @@ public class ResponseManager implements Runnable {
     private final ArrayList<Consumer<JSONObject>> sendMessageOnResponseCallbacks = new ArrayList<>();
     private final ArrayList<Consumer<JSONObject>> receiveMessageCallbacks = new ArrayList<>();
 
+    protected final Map<String, Integer> requestCounter = Collections.synchronizedMap(new TreeMap<>() {{
+        put("SIGN_UP", 0);
+        put("LOGIN", 0);
+        put("CREATE_CHAT", 0);
+        put("JOIN_CHAT", 0);
+        put("SEND", 0);
+    }});
 
 
     protected ResponseManager(BufferedReader reader) {
@@ -40,6 +50,17 @@ public class ResponseManager implements Runnable {
 
     private void parse(String data) {
         JSONObject dataJSON = new JSONObject(data);
+
+        if(!dataJSON.getString("action").equals("RECEIVE")) {
+            if (!this.requestCounter.containsKey(dataJSON.getString("action"))
+                    || this.requestCounter.get(dataJSON.getString("action")) == 0) {
+                System.out.println("ERROR: UNEXPECTED SERVER RESPONSE: " + data);
+                return;
+            }
+            this.requestCounter.put(dataJSON.getString("action"),
+                    this.requestCounter.get(dataJSON.getString("action")) - 1);
+        }
+
         switch (dataJSON.getString("action")) {
             case "SIGN_UP":
                 this.signUp(dataJSON);

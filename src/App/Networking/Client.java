@@ -4,7 +4,6 @@ import org.json.JSONObject;
 
 import java.io.*;
 import java.net.Socket;
-import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -48,6 +47,7 @@ public class Client implements java.io.Closeable {
      * @param password user's password
      */
     public void signUp(String username, String password) {
+        this.responseManager.requestCounter.put("SIGN_UP", this.responseManager.requestCounter.get("SIGN_UP") + 1);
         JSONObject request = new JSONObject() {{
             put("action", "SIGN_UP");
             put("username", username);
@@ -72,6 +72,7 @@ public class Client implements java.io.Closeable {
      * @param password user's password
      */
     public void login(String username, String password) {
+        this.responseManager.requestCounter.put("LOGIN", this.responseManager.requestCounter.get("LOGIN") + 1);
         JSONObject request = new JSONObject() {{
             put("action", "LOGIN");
             put("username", username);
@@ -94,6 +95,7 @@ public class Client implements java.io.Closeable {
      * Creates a new chat
      */
     public void createChat() {
+        this.responseManager.requestCounter.put("CREATE_CHAT", this.responseManager.requestCounter.get("CREATE_CHAT") + 1);
         JSONObject request = new JSONObject() {{
             put("action", "CREATE_CHAT");
         }};
@@ -117,6 +119,7 @@ public class Client implements java.io.Closeable {
      * @param chat_id id of the chat
      */
     public void joinChat(int chat_id) {
+        this.responseManager.requestCounter.put("JOIN_CHAT", this.responseManager.requestCounter.get("JOIN_CHAT") + 1);
         JSONObject request = new JSONObject() {{
             put("action", "JOIN_CHAT");
             put("chat_id", chat_id);
@@ -141,6 +144,7 @@ public class Client implements java.io.Closeable {
      * @param chatId the id of the chat
      */
     public void sendMessage(String content, String timeStamp, int chatId) {
+        this.responseManager.requestCounter.put("SEND", this.responseManager.requestCounter.get("SEND") + 1);
         JSONObject request = new JSONObject() {{
             put("action", "SEND");
             put("content", content);
@@ -210,38 +214,4 @@ public class Client implements java.io.Closeable {
             throw new RuntimeException(e);
         }
     }
-
-//    public static void test() {
-//        try (Client connie = new Client()) {
-//            connie.start("127.0.0.1", 8080);
-//            connie.writer.println(new JSONObject().put("action", "SIGN_UP").put("username", "Connie").put("password", "1234"));
-//            System.out.println(connie.reader.readLine());
-//            connie.writer.println(new JSONObject().put("action", "LOGIN").put("username", "Connie").put("password", "1234"));
-//            System.out.println(connie.reader.readLine());
-//            connie.writer.println(new JSONObject().put("action", "CREATE_CHAT"));
-//            System.out.println(connie.reader.readLine());
-//            int chat_id = 0;
-//            try (Client ivan = new Client()) {
-//                ivan.start("127.0.0.1", 8080);
-//                ivan.writer.println(new JSONObject().put("action", "SIGN_UP").put("username", "Ivan").put("password", "1234"));
-//                System.out.println(ivan.reader.readLine());
-//                ivan.writer.println(new JSONObject().put("action", "LOGIN").put("username", "Ivan").put("password", "1234"));
-//                System.out.println(ivan.reader.readLine());
-//                ivan.writer.println(new JSONObject().put("action", "JOIN_CHAT").put("chat_id", chat_id));
-//                System.out.println(ivan.reader.readLine());
-//                ivan.writer.println(new JSONObject().put("action", "SEND").put("content", "Hello Connie")
-//                        .put("time_stamp", "0:00").put("chat_id", chat_id));
-//                System.out.println(ivan.reader.readLine());
-//                System.out.println(connie.reader.readLine());
-//                connie.writer.println(new JSONObject().put("action", "SEND").put("content", "Hello Ivan")
-//                        .put("time_stamp", "0:00").put("chat_id", chat_id));
-//                System.out.println(connie.reader.readLine());
-//                System.out.println(ivan.reader.readLine());
-//            } catch (Exception e) {
-//                throw new RuntimeException(e);
-//            }
-//        } catch (Exception e) {
-//            throw new RuntimeException(e);
-//        }
-//    }
 }
