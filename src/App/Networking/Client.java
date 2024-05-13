@@ -58,8 +58,14 @@ public class Client implements java.io.Closeable {
 
     /**
      * Sets a callback function which will be called after the server's response
-     * on a SIGN_UP request
-     * The callback must expect a JSONObject object containing the server's response
+     * on a SIGN_UP request.
+     * The callback must expect a JSONObject object containing the server's response.
+     * The response has an attribute "result" which will return either "SUCCESS" or "ERROR".
+     * Attributes in case of:
+     * "SUCCESS":null
+     * "ERROR":
+     *      String message - error message
+     *
      * @param callback a lambda expression of the callback
      */
     public void addSignUpOnResponseCallback(Consumer<JSONObject> callback) {
@@ -83,8 +89,14 @@ public class Client implements java.io.Closeable {
 
     /**
      * Sets a callback function which will be called after the server's response
-     * on a LOGIN request
-     * The callback must expect a JSONObject object containing the server's response
+     * on a LOGIN request.
+     * The callback must expect a JSONObject object containing the server's response.
+     * The response has an attribute "result" which will return either "SUCCESS" or "ERROR".
+     * Attributes in case of:
+     * "SUCCESS": null
+     * "ERROR":
+     *      String message - error message
+     *
      * @param callback a lambda expression of the callback
      */
     public void addLoginOnResponseCallback(Consumer<JSONObject> callback) {
@@ -104,10 +116,15 @@ public class Client implements java.io.Closeable {
 
     /**
      * Sets a callback function which will be called after the server's response
-     * on a CREATE_CHAT request
-     * The callback must expect a JSONObject object containing the server's response
-     * The chat_id will be assigned by the server and returned in the response
-     * under the key "chat_id"
+     * on a CREATE_CHAT request.
+     * The callback must expect a JSONObject object containing the server's response.
+     * The response has an attribute "result" which will return either "SUCCESS" or "ERROR".
+     * Attributes in case of:
+     * "SUCCESS":
+     *      int chat_id
+     * "ERROR":
+     *      String message - error message
+     *
      * @param callback a lambda expression of the callback
      */
     public void addCreateChatOnResponseCallback(Consumer<JSONObject> callback) {
@@ -129,8 +146,14 @@ public class Client implements java.io.Closeable {
 
     /**
      * Sets a callback function which will be called after the server's response
-     * on a JOIN_CHAT request
-     * The callback must expect a JSONObject object containing the server's response
+     * on a JOIN_CHAT request.
+     * The callback must expect a JSONObject object containing the server's response.
+     * The response has an attribute "result" which will return either "SUCCESS" or "ERROR".
+     * Attributes in case of:
+     * "SUCCESS": null
+     * "ERROR":
+     *      String message - error message
+     *
      * @param callback a lambda expression of the callback
      */
     public void addJoinChatOnResponseCallback(Consumer<JSONObject> callback) {
@@ -156,8 +179,14 @@ public class Client implements java.io.Closeable {
 
     /**
      * Sets a callback function which will be called after the server's response
-     * on a SEND_MESSAGE request
-     * The callback must expect a JSONObject object containing the server's response
+     * on a SEND request.
+     * The callback must expect a JSONObject object containing the server's response.
+     * The response has an attribute "result" which will return either "SUCCESS" or "ERROR".
+     * Attributes in case of:
+     * "SUCCESS": null
+     * "ERROR":
+     *      String message - error message
+     *
      * @param callback a lambda expression of the callback
      */
     public void addSendMessageOnResponseCallback(Consumer<JSONObject> callback) {
@@ -165,13 +194,50 @@ public class Client implements java.io.Closeable {
     }
 
     /**
-     * Setts a callback which will be called in case somebody
-     * sent us a message
+     * Receives the messages sent to the user while disconnected
+     */
+    public void getQueuedMessages() {
+        this.responseManager.requestCounter.put("GET_QUEUED_MESSAGES", this.responseManager.requestCounter.get("GET_QUEUED_MESSAGES") + 1);
+        this.writer.println(new JSONObject().put("action", "GET_QUEUED_MESSAGES"));
+    }
+
+    /**
+     * Sets a callback function which will be called after the server's response
+     * on a GET_QUEUED_MESSAGES request.
+     * The callback must expect a JSONObject object containing the server's response.
+     * The response has an attribute "result" which will return either "SUCCESS" or "ERROR".
+     * Attributes in case of:
+     * "SUCCESS":
+     *      JSONArray messages - array of messages:
+     *          String time_stamp
+     *          String sender
+     *          String content
+     *          int chat_id
+     * "ERROR":
+     *      String message - error message
+     * <p>
+     *     Note: must be called after logging in
+     * </p>
+     *
      * @param callback a lambda expression of the callback
+     */
+    public void addGetQueuedMessagesOnResponseCallback(Consumer<JSONObject> callback) {
+        this.responseManager.addGetQueuedMessagesCallback(callback);
+    }
+
+    /**
+     * Sets a callback function which will be called after when somebody sends the user a message
+     * The callback must expect a JSONObject object containing the server's response.
+     * Attributes:
+     *      String time_stamp
+     *      String sender
+     *      String content
+     *      int chat_id
      */
     public void addReceiveMessageCallback(Consumer<JSONObject> callback) {
         this.responseManager.addReceiveMessageCallback(callback);
     }
+
 
     public static void main(String[] args) {
         try(Client client = new Client()) {
@@ -208,7 +274,9 @@ public class Client implements java.io.Closeable {
             client.addSendMessageOnResponseCallback(System.out::println);
             client.addCreateChatOnResponseCallback(System.out::println);
             client.addJoinChatOnResponseCallback(System.out::println);
+            client.addGetQueuedMessagesOnResponseCallback(System.out::println);
             client.login("IVAN", "1234");
+            client.getQueuedMessages();
             TimeUnit.SECONDS.sleep(1);
         } catch (IOException | InterruptedException e) {
             throw new RuntimeException(e);

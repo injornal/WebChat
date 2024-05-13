@@ -16,6 +16,11 @@ class Message {
     }
 
     public JSONObject toJSON() {
-        return new JSONObject().put("content", content).put("sender", sender).put("time_stamp", this.timeStamp).put("chat_id", chatId);
+        return new JSONObject() {{
+            put("content", content);
+            put("sender", sender);
+            put("time_stamp", timeStamp);
+            put("chat_id", chatId);
+        }};
     }
 }

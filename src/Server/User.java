@@ -1,5 +1,8 @@
 package Server;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import java.util.LinkedList;
 import java.util.Queue;
 
@@ -7,7 +10,7 @@ class User implements Comparable<User>{
     private String username;
     private String password;
     private ServerConnection connection;
-    private final Queue<Message> queuedMessages;
+    private Queue<Message> queuedMessages;
 
     protected User (String username, String password) {
         this.username = username;
@@ -31,11 +34,13 @@ class User implements Comparable<User>{
     }
 
     protected void connect(ServerConnection connection) {
-        System.out.println(queuedMessages);
         this.connection = connection;
-        for (Message message: queuedMessages) {
-            this.connection.receiveMessage(message);
-        }
+    }
+
+    protected Queue<Message> getQueuedMessages() {
+        Queue<Message> messages = this.queuedMessages;
+        this.queuedMessages = new LinkedList<>();
+        return messages;
     }
 
     protected void disconnect() {

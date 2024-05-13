@@ -1,5 +1,6 @@
 package Server;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -7,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.Queue;
 
 
 class ServerConnection implements Runnable {
@@ -59,6 +61,7 @@ class ServerConnection implements Runnable {
             case "LOGIN" -> this.login(dataJSON);
             case "CREATE_CHAT" -> this.createChat();
             case "JOIN_CHAT" -> this.joinChat(dataJSON.getInt("chat_id"));
+            case "GET_QUEUED_MESSAGES" -> this.getQueuedMessages();
             default -> new JSONObject().put("result", "EXCEPTION").put("message", "WRONG_ACTION");
         };
         return result.put("action", dataJSON.getString("action"));
@@ -131,6 +134,16 @@ class ServerConnection implements Runnable {
             this.user.connect(this);
         } else return new JSONObject().put("result", "ERROR").put("message", "WRONG_PASSWORD");
         return new JSONObject().put("result", "SUCCESS");
+    }
+
+    private JSONObject getQueuedMessages() {
+        if (isNotLoggedIn()) return new JSONObject().put("result", "ERROR").put("message", "NOT_LOGGED_IN");
+        Queue<Message> messages = this.user.getQueuedMessages();
+        JSONArray messageArray = new JSONArray();
+        for (Message message: messages) {
+            messageArray.put(message.toJSON());
+        }
+        return new JSONObject().put("messages", messageArray);
     }
 
     private boolean isNotLoggedIn() {
