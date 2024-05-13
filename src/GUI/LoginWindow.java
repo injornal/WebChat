@@ -29,9 +29,9 @@ public class LoginWindow extends JFrame {
         user = new JTextField();
         pass = new JPasswordField();
         loginButton = new JButton("Login");
-        JButton signupButton = new JButton("Sign Up");
+        JButton signUpButton = new JButton("Sign Up");
         loginButton.addActionListener(new LoginButton(this));
-        signupButton.addActionListener(new SignupButton(this));
+        signUpButton.addActionListener(new SignUpButton(this));
         JLabel uLabel = new JLabel("Username:");
         JLabel pLabel = new JLabel("Password:");
 
@@ -45,7 +45,7 @@ public class LoginWindow extends JFrame {
         panel.add(pLabel);
         panel.add(pass);
         panel.add(loginButton);
-        panel.add(signupButton);
+        panel.add(signUpButton);
 
         add(panel, BorderLayout.CENTER);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -104,9 +104,9 @@ public class LoginWindow extends JFrame {
             });
         }
     }
-    private class SignupButton implements ActionListener {
+    private class SignUpButton implements ActionListener {
         private LoginWindow frame;
-        public SignupButton(LoginWindow frame) {
+        public SignUpButton(LoginWindow frame) {
             this.frame = frame;
         }
         public void actionPerformed(ActionEvent e) {
@@ -131,17 +131,20 @@ public class LoginWindow extends JFrame {
                 {
                     String result = a.getString("result");
                     if (result.equals("SUCCESS")) {
-                        System.out.println("Signup Success");
+                        System.out.println("Sign Up Success");
                     }
                     else {
-                        System.out.println("Signup Fail");
-                        JOptionPane signupFail = new JOptionPane("User Already Exists");
-                        signupFail.showMessageDialog(null, "User Already Exists");
+                        System.out.println("Sign Up Fail");
+                        JOptionPane signUpFail = new JOptionPane("User Already Exists");
+                        signUpFail.showMessageDialog(null, "User Already Exists");
                         frame.getUserField().setText("");
                         frame.getPassField().setText("");
                     }
                 });
             }
         }
+    }
+    public static void main(String[] args) {
+        new LoginWindow(new Client());
     }
 }

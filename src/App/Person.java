@@ -1,4 +1,4 @@
-package Components;
+package App;
 
 public class Person {
     
