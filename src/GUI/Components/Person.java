@@ -1,4 +1,4 @@
-package Server.Components;
+package GUI.Components;
 
 public class Person {
     

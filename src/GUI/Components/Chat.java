@@ -1,5 +1,6 @@
-package Server.Components;
-import Server.Components.Person;
+package GUI.Components;
+import Server.Message;
+
 import java.util.*;
 
 
