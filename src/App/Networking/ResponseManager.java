@@ -10,8 +10,9 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.function.Consumer;
 
-public class ResponseManager implements Runnable {
+public class ResponseManager implements Runnable, java.io.Closeable {
     private final BufferedReader reader;
+    private final Thread thread;
     private final ArrayList<Consumer<JSONObject>> signUpOnResponseCallbacks = new ArrayList<>();
     private final ArrayList<Consumer<JSONObject>> loginOnResponseCallbacks = new ArrayList<>();
     private final ArrayList<Consumer<JSONObject>> createChatOnResponseCallbacks = new ArrayList<>();
@@ -32,6 +33,8 @@ public class ResponseManager implements Runnable {
 
     protected ResponseManager(BufferedReader reader) {
         this.reader = reader;
+        this.thread = new Thread(this);
+        this.thread.start();
     }
 
     @Override
@@ -45,9 +48,7 @@ public class ResponseManager implements Runnable {
                 }
                 this.parse(data);
             }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        } catch (IOException ignore) {}
     }
 
     private void parse(String data) {
@@ -156,5 +157,10 @@ public class ResponseManager implements Runnable {
 
     protected void addGetQueuedMessagesCallback(Consumer<JSONObject> callback) {
         this.getQueuedMessagesCallbacks.add(callback);
+    }
+
+    @Override
+    public void close() throws IOException {
+        this.thread.interrupt();
     }
 }

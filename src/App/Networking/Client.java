@@ -4,8 +4,6 @@ import org.json.JSONObject;
 
 import java.io.*;
 import java.net.Socket;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
@@ -14,7 +12,6 @@ public class Client implements java.io.Closeable {
     private PrintWriter writer;
     private Socket socket;
     private ResponseManager responseManager;
-    private ExecutorService executor;
 
 
     /**
@@ -27,9 +24,7 @@ public class Client implements java.io.Closeable {
         try {
             this.socket = new Socket(ip, port);
             this.writer = new PrintWriter(socket.getOutputStream(), true);
-            this.executor = Executors.newSingleThreadExecutor();
             this.responseManager = new ResponseManager(new BufferedReader(new InputStreamReader(socket.getInputStream())));
-            executor.submit(responseManager);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -38,7 +33,7 @@ public class Client implements java.io.Closeable {
     @Override
     public void close() throws IOException {
         this.socket.close();
-        this.executor.close();
+        this.responseManager.close();
     }
 
     /**

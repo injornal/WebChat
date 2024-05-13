@@ -3,25 +3,25 @@ package Server;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.*;
 import java.net.Socket;
 import java.util.Queue;
 
 
-class ServerConnection implements Runnable {
+class ServerConnection implements Runnable, Closeable {
     private final PrintWriter writer;
     private final BufferedReader reader;
     private final Socket conn;
     private User user;
+    private final Thread thread;
 
     ServerConnection(Socket conn) {
         try {
             this.conn = conn;
             this.writer = new PrintWriter(conn.getOutputStream(), true);
             this.reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+            this.thread = new Thread(this);
+            this.thread.start();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -148,5 +148,11 @@ class ServerConnection implements Runnable {
 
     private boolean isNotLoggedIn() {
         return this.user == null;
+    }
+
+    @Override
+    public void close() throws IOException {
+        this.thread.interrupt();;
+        this.conn.close();
     }
 }

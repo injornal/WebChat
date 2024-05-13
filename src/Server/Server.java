@@ -2,15 +2,15 @@ package Server;
 
 import java.io.*;
 import java.net.ServerSocket;
-import java.net.Socket;
 import java.util.*;
 
 
-class Server {
+class Server implements Closeable{
     private boolean running;
     private int port;
     protected static final Map<String, User> users = Collections.synchronizedMap(new TreeMap<>());
     protected static final List<Chat> chats = Collections.synchronizedList(new ArrayList<>());
+    private final ArrayList<ServerConnection> connections = new ArrayList<>();
 
 
     private void introduce() {
@@ -24,17 +24,28 @@ class Server {
         this.running = true;
         try (ServerSocket serverSocket = new ServerSocket(port)) {
             while (running) {
-                Socket conn = serverSocket.accept();
-                Thread thread = new Thread(new ServerConnection(conn));
-                thread.start();
+                this.connections.add(new ServerConnection(serverSocket.accept()));
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
+
+
     public static void main(String[] args) {
-        Server server = new Server();
-        server.start(8080);
+        try (Server server = new Server()) {
+            server.start(8080);
+        }
+        catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public void close() throws IOException {
+        for (ServerConnection connection: connections) {
+            connection.close();
+        }
     }
 }
