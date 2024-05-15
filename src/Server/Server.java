@@ -8,7 +8,9 @@ import java.util.*;
 class Server implements Closeable{
     private boolean running;
     private int port;
-    protected static final Map<String, User> users = Collections.synchronizedMap(new TreeMap<>());
+    protected static final Map<String, User> users = Collections.synchronizedMap(new TreeMap<>() {{
+        put("TestUser", new User("TestUser", "TestPassword"));
+    }});
     protected static final List<Chat> chats = Collections.synchronizedList(new ArrayList<>());
     private final ArrayList<ServerConnection> connections = new ArrayList<>();
 
