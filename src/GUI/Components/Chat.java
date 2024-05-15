@@ -30,6 +30,10 @@ public class Chat {
     public ArrayList<Message> getMessages(){
         return messages;
     }
+
+    public void receiveMessage(Message m) {
+        messages.add(m);
+    }
     //chat.getUsers
     //chat.joinchat
 
