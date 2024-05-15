@@ -14,34 +14,36 @@ import javax.swing.JTextField;
 import javax.swing.JPasswordField;
 
 import App.Networking.Client;
+import GUI.Components.Chat;
+import GUI.Components.Person;
 
 public class ChatsWindow extends JFrame {
     private JPanel panel;
     private App.Networking.Client client;
-    //private Chat[] chats;
+    private Chat[] chats;
+    private JButton[] JButtons;
 
-    public ChatsWindow(Client client) {
+    public ChatsWindow(Client client, Chat[] chats) {
         this.client = client;
         client.start("127.0.0.1", 8080);
+        this.chats = chats;
 
         panel = new JPanel();
         panel.setBorder(BorderFactory.createEmptyBorder(30,30,10,30));
         panel.setLayout(new GridLayout(2,4));
         setMinimumSize(new Dimension(600, 300));
         setMaximumSize(new Dimension(600, 300));
-        JButton[] chats = new JButton[8];
-        int increment = 1;
-        for (JButton chat : chats) {
-            // if (chats[increment-1].exists) {
-            //     chat = new JButton("Chat" + increment);
-            // }
-            // else {
-            //     chat = new JButton("New Chat");
-            // }
+        JButton[] JButtons = new JButton[8];
+        for(int i = 0; i < chats.length; i++){
+            if (chats[i].exists()) {
+                JButtons[i] = new JButton("Chat " + (i + 1));
+            }
+            else {
+                JButtons[i] = new JButton("New Chat");
+            }
             
-            increment++;
-            chat.addActionListener(new ClickChat(this, increment-1));
-            panel.add(chat);
+            JButtons[i].addActionListener(new ClickChat(this, i));
+            panel.add(JButtons[i]);
         }
 
         add(panel, BorderLayout.CENTER);
@@ -54,6 +56,14 @@ public class ChatsWindow extends JFrame {
         client.start("127.0.0.1", 8080);
     }
 
+    private Chat[] getChats(){
+        return chats;
+    }
+
+    private JButton[] getJButtons(){
+        return JButtons;   
+    }
+
     private class ClickChat implements ActionListener {
         private ChatsWindow frame;
         private int index;
@@ -62,18 +72,32 @@ public class ChatsWindow extends JFrame {
             this.index = index;
         }
         public void actionPerformed(ActionEvent e) {
-            // option 1 (if chat doesnt occupy tile): create chat
-            //   popup to enter list of people
-            //   check if users exist, if user has less than 8 chats,
-            //     fail -> add popup to panel
-            //     fail -> delete addChat popup
-            //     success -> update icon
-            //     success -> open chat, close this window
-            // option 2 (if chat occupies tile): opens chat, close this window
+            if(!chats[index].exists()){
+                JButtons[index] = new JButton("Chat " + (index + 1));
+                System.out.println("doesnt exist");
+                //     success -> open chat, close this window
+            }
+            else {
+                System.out.println("exists");
+                // option 2 (if chat occupies tile): opens chat, close this window
+            }
         }
     }
     public static void main(String[] args) {
         Client client = new Client();
-        new ChatsWindow(client);
+        Chat[] chats = new Chat[8];
+        chats[0] = new Chat(0);
+        chats[0].joinChat(new Person(null, false));
+        chats[1] = new Chat(1);
+        chats[2] = new Chat(2);
+        chats[2].joinChat(new Person(null, false));
+        chats[3] = new Chat(3);
+        chats[4] = new Chat(4);
+        chats[5] = new Chat(5);
+        chats[5].joinChat(new Person(null, false));
+        chats[6] = new Chat(6);
+        chats[7] = new Chat(7);
+
+        new ChatsWindow(client, chats);
     }
 }

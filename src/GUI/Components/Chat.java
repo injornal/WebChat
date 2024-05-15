@@ -19,12 +19,8 @@ public class Chat {
         return chatID;
     }
 
-    public void addAccess(Person p){
+    public void joinChat(Person p){
         users.add(p);
-    }
-
-    public ArrayList<Person> authorizedUsers(){
-        return users;
     }
 
     public ArrayList<Message> getMessages(){
@@ -34,7 +30,13 @@ public class Chat {
     public void receiveMessage(Message m) {
         messages.add(m);
     }
-    //chat.getUsers
-    //chat.joinchat
+
+    public ArrayList<Person> getUsers(){
+        return users;
+    }
+    
+    public boolean exists(){
+        return users.size() != 0;
+    }
 
 }
