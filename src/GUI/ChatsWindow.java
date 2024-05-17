@@ -37,7 +37,7 @@ public class ChatsWindow extends JFrame {
         panel.setLayout(new GridLayout(2,4));
         setMinimumSize(new Dimension(600, 300));
         setMaximumSize(new Dimension(600, 300));
-        JButtons = new JButton[8];
+        JButtons = new JButton[7];
         for(int i = 0; i < chats.length; i++){
             if (chats[i].exists()) {
                 JButtons[i] = new JButton("Chat " + (i + 1));
@@ -92,22 +92,5 @@ public class ChatsWindow extends JFrame {
                 // option 2 (if chat occupies tile): opens chat, close this window
             }
         }
-    }
-    public static void main(String[] args) {
-        Client client = new Client();
-        Chat[] chats = new Chat[8];
-        chats[0] = new Chat(0);
-        chats[0].joinChat(new Person(null, false));
-        chats[1] = new Chat(1);
-        chats[2] = new Chat(2);
-        chats[2].joinChat(new Person(null, false));
-        chats[3] = new Chat(3);
-        chats[4] = new Chat(4);
-        chats[5] = new Chat(5);
-        chats[5].joinChat(new Person(null, false));
-        chats[6] = new Chat(6);
-        chats[7] = new Chat(7);
-
-        new ChatsWindow(client, chats);
     }
 }
