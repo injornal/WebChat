@@ -12,7 +12,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.JPasswordField;
-
+import GUI.Components.Chat;
+import GUI.Components.Person;
 import App.Networking.Client;
 
 public class LoginWindow extends JFrame {
@@ -20,6 +21,7 @@ public class LoginWindow extends JFrame {
     private JTextField user;
     private JPasswordField pass;
     private JButton loginButton;
+    private ChatsWindow chatsWindow;
     private App.Networking.Client client;
 
     public LoginWindow(Client client) {
@@ -48,10 +50,13 @@ public class LoginWindow extends JFrame {
         panel.add(signUpButton);
 
         add(panel, BorderLayout.CENTER);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setTitle("WebChat");
         pack();
         setVisible(true);
+    }
+    
+    public void setChatsWindow(ChatsWindow chatsWindow) {
+        this.chatsWindow = chatsWindow;
     }
     private boolean isAlpha(String s) {
         String alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -74,6 +79,7 @@ public class LoginWindow extends JFrame {
     private JPasswordField getPassField() {
         return pass;
     }
+
     private class LoginButton implements ActionListener {
         private LoginWindow frame;
         public LoginButton(LoginWindow frame) {
@@ -91,8 +97,20 @@ public class LoginWindow extends JFrame {
             {
                 String result = a.getString("result");
                 if (result.equals("SUCCESS")) {
-                    //open chats
-                    //closes this window
+                    frame.setVisible(false);
+                    Chat[] chats = new Chat[8];
+                    chats[0] = new Chat(0);
+                    chats[1] = new Chat(1);
+                    chats[2] = new Chat(2);
+                    chats[3] = new Chat(3);
+                    chats[4] = new Chat(4);
+                    chats[5] = new Chat(5);
+                    chats[6] = new Chat(6);
+                    chats[7] = new Chat(7);
+
+                    frame.setChatsWindow(new ChatsWindow(client, chats));
+                    //need a list of chats for a specfic person
+                    //that can be accessed through username
                 }
                 else {
                     JOptionPane loginPane = new JOptionPane("Login Fail");
@@ -131,10 +149,12 @@ public class LoginWindow extends JFrame {
                 {
                     String result = a.getString("result");
                     if (result.equals("SUCCESS")) {
-                        System.out.println("Sign Up Success");
+                        JOptionPane signUpPane = new JOptionPane("Sign Up Success");
+                        signUpPane.showMessageDialog(null, "Sign Up Success");
+                        signUpPane.setBorder(BorderFactory.createEmptyBorder(30,30,10,30));
+                    
                     }
                     else {
-                        System.out.println("Sign Up Fail");
                         JOptionPane signUpFail = new JOptionPane("User Already Exists");
                         signUpFail.showMessageDialog(null, "User Already Exists");
                         frame.getUserField().setText("");

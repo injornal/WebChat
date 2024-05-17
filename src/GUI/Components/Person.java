@@ -5,6 +5,7 @@ public class Person {
     private String name;
     private boolean loggedIn;
     private int[] chatIDs;
+    private Chat[] chats;
 
     public Person(String name, boolean status){
         this.name = name;
@@ -35,7 +36,14 @@ public class Person {
         return(-1 == chatIDs[index]);
     }
 
+    public Chat[] getChats() {
+        return chats;
+    }
 
-
-
+    public void addChat(int index, int chatID) {
+        chatIDs[index] = chatID;
+        chats[index] = new Chat(chatID);
+    }
+    
+    public void joinChat(int index, int chatID, )
 }
