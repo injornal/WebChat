@@ -24,11 +24,13 @@ public class ChatsWindow extends JFrame {
     private Chat[] chats;
     private JButton[] JButtons;
     private ChatDisplay[] displays;
+    private Person person;
 
-    public ChatsWindow(Client client, Chat[] chats) {
+    public ChatsWindow(Client client, Chat[] chats, Person person) {
         this.client = client;
         client.start("127.0.0.1", 8080);
         this.chats = chats;
+        this.person = person;
 
         panel = new JPanel();
         panel.setBorder(BorderFactory.createEmptyBorder(30,30,10,30));
@@ -39,6 +41,7 @@ public class ChatsWindow extends JFrame {
         for(int i = 0; i < chats.length; i++){
             if (chats[i].exists()) {
                 JButtons[i] = new JButton("Chat " + (i + 1));
+                
             }
             else {
                 JButtons[i] = new JButton("New Chat");

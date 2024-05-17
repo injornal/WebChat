@@ -22,6 +22,7 @@ public class LoginWindow extends JFrame {
     private JPasswordField pass;
     private JButton loginButton;
     private ChatsWindow chatsWindow;
+    private Person person;
     private App.Networking.Client client;
 
     public LoginWindow(Client client) {
@@ -79,6 +80,9 @@ public class LoginWindow extends JFrame {
     private JPasswordField getPassField() {
         return pass;
     }
+    private void setPerson(Person person) {
+        this.person = person;
+    }
 
     private class LoginButton implements ActionListener {
         private LoginWindow frame;
@@ -98,19 +102,13 @@ public class LoginWindow extends JFrame {
                 String result = a.getString("result");
                 if (result.equals("SUCCESS")) {
                     frame.setVisible(false);
-                    Chat[] chats = new Chat[8];
-                    chats[0] = new Chat(0);
-                    chats[1] = new Chat(1);
-                    chats[2] = new Chat(2);
-                    chats[3] = new Chat(3);
-                    chats[4] = new Chat(4);
-                    chats[5] = new Chat(5);
-                    chats[6] = new Chat(6);
-                    chats[7] = new Chat(7);
 
-                    frame.setChatsWindow(new ChatsWindow(client, chats));
-                    //need a list of chats for a specfic person
-                    //that can be accessed through username
+                    Chat[] chats = client.getChats(u);
+
+
+                    person = new Person(u, true);
+                    person.setChats(chats);
+                    frame.setChatsWindow(new ChatsWindow(client, chats, person));
                 }
                 else {
                     JOptionPane loginPane = new JOptionPane("Login Fail");
