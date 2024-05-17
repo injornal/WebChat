@@ -221,6 +221,19 @@ public class Client implements java.io.Closeable {
     }
 
     /**
+     * Requests all the chats that the user is in
+     */
+    public void getChats()
+    {
+        this.responseManager.requestCounter.put("GET_CHATS", this.responseManager.requestCounter.get("GET_CHATS") + 1);
+        this.writer.println(new JSONObject().put("action", "GET_CHATS"));
+    }
+
+    public void addGetChatsOnResponseCallback(Consumer<JSONObject> callback) {
+        this.responseManager.addGetChatsOnResponseCallback(callback);
+    }
+
+    /**
      * Sets a callback function which will be called after when somebody sends the user a message
      * The callback must expect a JSONObject object containing the server's response.
      * Attributes:
@@ -270,8 +283,12 @@ public class Client implements java.io.Closeable {
             client.addCreateChatOnResponseCallback(System.out::println);
             client.addJoinChatOnResponseCallback(System.out::println);
             client.addGetQueuedMessagesOnResponseCallback(System.out::println);
+            client.addGetChatsOnResponseCallback(System.out::println);
             client.login("IVAN", "1234");
             client.getQueuedMessages();
+            client.createChat();
+            client.createChat();
+            client.getChats();
             TimeUnit.SECONDS.sleep(1);
         } catch (IOException | InterruptedException e) {
             throw new RuntimeException(e);

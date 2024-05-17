@@ -33,8 +33,6 @@ class Server implements Closeable{
         }
     }
 
-
-
     public static void main(String[] args) {
         try (Server server = new Server()) {
             server.start(8080);

@@ -5,6 +5,7 @@ import org.json.JSONObject;
 
 import java.io.*;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.Queue;
 
 
@@ -62,6 +63,7 @@ class ServerConnection implements Runnable, Closeable {
             case "CREATE_CHAT" -> this.createChat();
             case "JOIN_CHAT" -> this.joinChat(dataJSON.getInt("chat_id"));
             case "GET_QUEUED_MESSAGES" -> this.getQueuedMessages();
+            case "GET_CHATS" -> this.getChats();
             default -> new JSONObject().put("result", "EXCEPTION").put("message", "WRONG_ACTION");
         };
         return result.put("action", dataJSON.getString("action"));
@@ -144,6 +146,17 @@ class ServerConnection implements Runnable, Closeable {
             messageArray.put(message.toJSON());
         }
         return new JSONObject().put("messages", messageArray);
+    }
+
+    private JSONObject getChats() {
+        if (isNotLoggedIn()) return new JSONObject().put("result", "ERROR").put("message", "NOT_LOGGED_IN");
+        ArrayList<Integer> userChats = new ArrayList<>();
+        for (int i = 0; i < Server.chats.size(); i++) {
+            if (Server.chats.get(i).containsUser(this.user)) {
+                userChats.add(i);
+            }
+        }
+        return new JSONObject().put("chats", userChats);
     }
 
     private boolean isNotLoggedIn() {

@@ -20,6 +20,7 @@ public class ResponseManager implements Runnable, java.io.Closeable {
     private final ArrayList<Consumer<JSONObject>> sendMessageOnResponseCallbacks = new ArrayList<>();
     private final ArrayList<Consumer<JSONObject>> getQueuedMessagesCallbacks = new ArrayList<>();
     private final ArrayList<Consumer<JSONObject>> receiveMessageCallbacks = new ArrayList<>();
+    private final ArrayList<Consumer<JSONObject>> getChatCallbacks = new ArrayList<>();
 
     protected final Map<String, Integer> requestCounter = Collections.synchronizedMap(new TreeMap<>() {{
         put("SIGN_UP", 0);
@@ -28,6 +29,7 @@ public class ResponseManager implements Runnable, java.io.Closeable {
         put("JOIN_CHAT", 0);
         put("SEND", 0);
         put("GET_QUEUED_MESSAGES", 0);
+        put("GET_CHATS", 0);
     }});
 
 
@@ -85,6 +87,9 @@ public class ResponseManager implements Runnable, java.io.Closeable {
                 break;
             case "GET_QUEUED_MESSAGES":
                 this.getQueuedMessages(dataJSON);
+                break;
+            case "GET_CHATS":
+                this.getChats(dataJSON);
                 break;
         }
     }
@@ -157,6 +162,16 @@ public class ResponseManager implements Runnable, java.io.Closeable {
 
     protected void addGetQueuedMessagesCallback(Consumer<JSONObject> callback) {
         this.getQueuedMessagesCallbacks.add(callback);
+    }
+
+    protected void getChats(JSONObject data) {
+        for (Consumer<JSONObject> callback : this.getChatCallbacks) {
+            callback.accept(data);
+        }
+    }
+
+    protected void addGetChatsOnResponseCallback(Consumer<JSONObject> callback) {
+        this.getChatCallbacks.add(callback);
     }
 
     @Override
