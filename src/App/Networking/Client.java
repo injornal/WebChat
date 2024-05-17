@@ -203,7 +203,7 @@ public class Client implements java.io.Closeable {
      * The response has an attribute "result" which will return either "SUCCESS" or "ERROR".
      * Attributes in case of:
      * "SUCCESS":
-     *      JSONArray messages - array of messages:
+     *      JSONArray "messages" - array of messages:
      *          String time_stamp
      *          String sender
      *          String content
@@ -229,6 +229,12 @@ public class Client implements java.io.Closeable {
         this.writer.println(new JSONObject().put("action", "GET_CHATS"));
     }
 
+    /**
+     * Sets a callback function which will be called after when somebody sends the user a message
+     * The callback must expect a JSONObject object containing the server's response.
+     * Attributes:
+     *      JSONArray "chats" - integer ID's of all the accessible to user chats
+     */
     public void addGetChatsOnResponseCallback(Consumer<JSONObject> callback) {
         this.responseManager.addGetChatsOnResponseCallback(callback);
     }
