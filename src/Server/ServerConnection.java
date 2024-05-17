@@ -2,6 +2,7 @@ package Server;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.json.Kim;
 
 import java.io.*;
 import java.net.Socket;
@@ -124,6 +125,7 @@ class ServerConnection implements Runnable, Closeable {
     }
 
     private JSONObject login(JSONObject data) {
+        if (!isNotLoggedIn()) return new JSONObject().put("result", "ERROR").put("message", "ALREADY_LOGGED_IN");
         String username = data.getString("username");
         User user;
         if (Server.users.containsKey(username)) {
