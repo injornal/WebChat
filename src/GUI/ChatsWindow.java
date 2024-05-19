@@ -51,6 +51,9 @@ public class ChatsWindow extends JFrame implements Serializable {
             panel.add(JButtons[i]);
         }
 
+        JButton logout = new JButton("Logout");
+        logout.addActionListener(new Logout(this));
+        panel.add(logout);
 
         add(panel, BorderLayout.CENTER);
         setTitle("WebChat");
@@ -77,19 +80,24 @@ public class ChatsWindow extends JFrame implements Serializable {
                 frame.setVisible(false);
                 JButtons[index] = new JButton("Chat " + (index + 1));
 
-                Chat chat = new Chat(1);                        // generate chatID
-                Person person = new Person("chai");  // figure out how to add person in LoginWindow
+                Chat chat = new Chat(1);
                 displays[index] = new ChatDisplay(client, chat, person, frame);
-
-
-
-                //     success -> open chat, close this window
             }
             else {
                 System.out.println("exists");
                 frame.setVisible(false);
-                // option 2 (if chat occupies tile): opens chat, close this window
             }
+        }
+    }
+    private class Logout implements ActionListener {
+        private ChatsWindow frame;
+        public Logout(ChatsWindow frame) {
+            this.frame = frame;
+        }
+        public void actionPerformed(ActionEvent e) {
+            System.out.println("logged out");
+            //go into save state
+            //status logged out
         }
     }
 }
