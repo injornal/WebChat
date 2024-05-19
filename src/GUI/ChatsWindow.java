@@ -4,6 +4,8 @@ import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.Serializable;
+
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -11,6 +13,9 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+
+import org.json.JSONArray;
+
 import javax.swing.JPasswordField;
 
 import App.Networking.Client;
@@ -18,18 +23,15 @@ import GUI.Components.Chat;
 import GUI.Components.Person;
 import Server.Message;
 
-public class ChatsWindow extends JFrame {
+public class ChatsWindow extends JFrame implements Serializable {
     private JPanel panel;
     private App.Networking.Client client;
-    private Chat[] chats;
     private JButton[] JButtons;
     private ChatDisplay[] displays;
     private Person person;
 
-    public ChatsWindow(Client client, Chat[] chats, Person person) {
+    public ChatsWindow(Client client, Person person) {
         this.client = client;
-        client.start("127.0.0.1", 8080);
-        this.chats = chats;
         this.person = person;
 
         panel = new JPanel();
@@ -38,10 +40,9 @@ public class ChatsWindow extends JFrame {
         setMinimumSize(new Dimension(600, 300));
         setMaximumSize(new Dimension(600, 300));
         JButtons = new JButton[7];
-        for(int i = 0; i < chats.length; i++){
-            if (chats[i].exists()) {
-                JButtons[i] = new JButton("Chat " + (i + 1));
-                
+        for (int i = 0; i < 7; i++) {
+            if (person.exists(i)) {
+                JButtons[i] = new JButton("" + person.getChatIds()[i]);
             }
             else {
                 JButtons[i] = new JButton("New Chat");
@@ -50,22 +51,20 @@ public class ChatsWindow extends JFrame {
             panel.add(JButtons[i]);
         }
 
+
         add(panel, BorderLayout.CENTER);
         setTitle("WebChat");
         pack();
         setVisible(true);
-
-        client = new Client();
-        client.start("127.0.0.1", 8080);
     }
 
-    private Chat[] getChats(){
-        return chats;
-    }
-    private JButton[] getJButtons(){
+    private JButton[] getJButtons() {
         return JButtons;   
     }
-
+    private Person getPerson() {
+        return person;
+    }
+    
     private class ClickChat implements ActionListener {
         private ChatsWindow frame;
         private int index;
@@ -74,12 +73,12 @@ public class ChatsWindow extends JFrame {
             this.index = index;
         }
         public void actionPerformed(ActionEvent e) {
-            if (!chats[index].exists()) {
+            if (!frame.getPerson().exists(index)) {
                 frame.setVisible(false);
                 JButtons[index] = new JButton("Chat " + (index + 1));
 
                 Chat chat = new Chat(1);                        // generate chatID
-                Person person = new Person("chai", true);  // figure out how to add person in LoginWindow
+                Person person = new Person("chai");  // figure out how to add person in LoginWindow
                 displays[index] = new ChatDisplay(client, chat, person, frame);
 
 

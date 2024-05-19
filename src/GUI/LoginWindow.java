@@ -4,6 +4,9 @@ import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.Serializable;
+import java.util.ArrayList;
+
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -11,6 +14,9 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+
+import org.json.JSONArray;
+
 import javax.swing.JPasswordField;
 import GUI.Components.Chat;
 import GUI.Components.Person;
@@ -99,16 +105,20 @@ public class LoginWindow extends JFrame {
             client.login(u, p);
             client.addLoginOnResponseCallback((a) ->
             {
-                String result = a.getString("result");
-                if (result.equals("SUCCESS")) {
+                String loginResult = a.getString("result");
+                if (loginResult.equals("SUCCESS")) {
+                    ArrayList<Integer> chatIDs = new ArrayList<Integer>();
+                    client.getChats();
+                    client.addGetChatsOnResponseCallback((b) -> {
+                        JSONArray result = a.getJSONArray("chats");
+                        for (int i = 0; i < result.length(); i++) {
+                            chatIDs.add((int) result.get(i));
+                        }
+                        person.setChatIDs(chatIDs);
+                    });
                     frame.setVisible(false);
-
-                    Chat[] chats = client.getChats(u);
-
-
-                    person = new Person(u, true);
-                    person.setChats(chats);
-                    frame.setChatsWindow(new ChatsWindow(client, chats, person));
+                    frame.setPerson(new Person(frame.getUserField().getText()));
+                    frame.setChatsWindow(new ChatsWindow(client, person));
                 }
                 else {
                     JOptionPane loginPane = new JOptionPane("Login Fail");
@@ -136,11 +146,16 @@ public class LoginWindow extends JFrame {
             if (u.length() < 5 || u.length() > 12 || !isAlpha(u)) {
                 JOptionPane invalidUser = new JOptionPane("Invalid User");
                 invalidUser.showMessageDialog(null, "Invalid User");
+                frame.getUserField().setText("");
+                frame.getPassField().setText("");
             }
             else if (p.length() < 5 || u.length() > 24) {
                 JOptionPane invalidPassword = new JOptionPane("Invalid Password");
                 invalidPassword.showMessageDialog(null, "Invalid Password");
+                frame.getUserField().setText("");
+                frame.getPassField().setText("");
             }
+
             else {
                 client.signUp(u, p);
                 client.addSignUpOnResponseCallback((a) ->
@@ -150,7 +165,6 @@ public class LoginWindow extends JFrame {
                         JOptionPane signUpPane = new JOptionPane("Sign Up Success");
                         signUpPane.showMessageDialog(null, "Sign Up Success");
                         signUpPane.setBorder(BorderFactory.createEmptyBorder(30,30,10,30));
-                    
                     }
                     else {
                         JOptionPane signUpFail = new JOptionPane("User Already Exists");
