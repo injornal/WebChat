@@ -18,9 +18,9 @@ public class ResponseManager implements Runnable, java.io.Closeable {
     private final ArrayList<Consumer<JSONObject>> createChatOnResponseCallbacks = new ArrayList<>();
     private final ArrayList<Consumer<JSONObject>> joinChatOnResponseCallbacks = new ArrayList<>();
     private final ArrayList<Consumer<JSONObject>> sendMessageOnResponseCallbacks = new ArrayList<>();
-    private final ArrayList<Consumer<JSONObject>> getQueuedMessagesCallbacks = new ArrayList<>();
     private final ArrayList<Consumer<JSONObject>> receiveMessageCallbacks = new ArrayList<>();
     private final ArrayList<Consumer<JSONObject>> getChatCallbacks = new ArrayList<>();
+    private final ArrayList<Consumer<JSONObject>> getMessagesCallbacks = new ArrayList<>();
 
     protected final Map<String, Integer> requestCounter = Collections.synchronizedMap(new TreeMap<>() {{
         put("SIGN_UP", 0);
@@ -28,8 +28,8 @@ public class ResponseManager implements Runnable, java.io.Closeable {
         put("CREATE_CHAT", 0);
         put("JOIN_CHAT", 0);
         put("SEND", 0);
-        put("GET_QUEUED_MESSAGES", 0);
         put("GET_CHATS", 0);
+        put("GET_MESSAGES", 0);
     }});
 
 
@@ -85,11 +85,11 @@ public class ResponseManager implements Runnable, java.io.Closeable {
             case "RECEIVE":
                 this.receiveMessage(dataJSON);
                 break;
-            case "GET_QUEUED_MESSAGES":
-                this.getQueuedMessages(dataJSON);
-                break;
             case "GET_CHATS":
                 this.getChats(dataJSON);
+                break;
+            case "GET_MESSAGES":
+                this.getMessages(dataJSON);
                 break;
         }
     }
@@ -154,16 +154,6 @@ public class ResponseManager implements Runnable, java.io.Closeable {
         this.receiveMessageCallbacks.add(callback);
     }
 
-    protected void getQueuedMessages(JSONObject data) {
-        for (Consumer<JSONObject> callback : this.getQueuedMessagesCallbacks) {
-            callback.accept(data);
-        }
-    }
-
-    protected void addGetQueuedMessagesCallback(Consumer<JSONObject> callback) {
-        this.getQueuedMessagesCallbacks.add(callback);
-    }
-
     protected void getChats(JSONObject data) {
         for (Consumer<JSONObject> callback : this.getChatCallbacks) {
             callback.accept(data);
@@ -172,6 +162,16 @@ public class ResponseManager implements Runnable, java.io.Closeable {
 
     protected void addGetChatsOnResponseCallback(Consumer<JSONObject> callback) {
         this.getChatCallbacks.add(callback);
+    }
+
+    protected void getMessages(JSONObject data) {
+        for (Consumer<JSONObject> callback : this.getMessagesCallbacks) {
+            callback.accept(data);
+        }
+    }
+
+    protected void addGetMessagesOnResponseCallback(Consumer<JSONObject> callback) {
+        this.getMessagesCallbacks.add(callback);
     }
 
     @Override

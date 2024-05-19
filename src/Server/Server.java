@@ -12,6 +12,7 @@ class Server implements Closeable{
         put("TestUser", new User("TestUser", "TestPassword"));
     }});
     protected static final List<Chat> chats = Collections.synchronizedList(new ArrayList<>());
+    // TODO fix chat removal issue
     private final ArrayList<ServerConnection> connections = new ArrayList<>();
 
 

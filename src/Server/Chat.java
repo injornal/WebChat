@@ -1,19 +1,29 @@
 package Server;
 
-import java.util.ArrayList;
-import java.util.TreeSet;
+import java.util.*;
 
 class Chat {
-    private final TreeSet<User> users = new TreeSet<User>();
-    public TreeSet<User> getUsers() {
+    private final Set<User> users = new HashSet<>();
+    private final List<Message> messages = new ArrayList<>();
+
+    protected Set<User> getUsers() {
         return users;
     }
 
-    public void join(User user) {
+    protected void joinUser(User user) {
         this.users.add(user);
     }
 
-    public boolean containsUser(User user) {
+    protected boolean containsUser(User user) {
         return this.users.contains(user);
+    }
+
+    protected void receiveMessage(Message message) {
+        this.messages.add(message);
+    }
+
+    protected List<Message> getMessages()
+    {
+        return this.messages;
     }
 }
