@@ -15,8 +15,8 @@ public class Client implements java.io.Closeable {
 
 
     /**
-     * Start the client
-     * Connects to the server at the given ip and port
+     * Start the client.
+     * Connects to the server at the given ip and port.
      * @param ip server ip
      * @param port server port
      */
@@ -56,11 +56,21 @@ public class Client implements java.io.Closeable {
      * on a SIGN_UP request.
      * The callback must expect a JSONObject object containing the server's response.
      * The response has an attribute "result" which will return either "SUCCESS" or "ERROR".
-     * Attributes in case of:
-     * "SUCCESS": null
-     * "ERROR":
-     *      String message - error message
-     *
+     * <p>Attributes in case of:</p>
+     * <ul>
+     *  <li>"SUCCESS":
+     *   <ul>
+     *    <li>null</li>
+     *   </ul>
+     *  </li>
+     * </ul>
+     * <ul>
+     *  <li>"ERROR":
+     *   <ul>
+     *    <li>String message - error message</li>
+     *   </ul>
+     *  </li>
+     * </ul>
      * @param callback a lambda expression of the callback
      */
     public void addSignUpOnResponseCallback(Consumer<JSONObject> callback) {
@@ -68,7 +78,7 @@ public class Client implements java.io.Closeable {
     }
 
     /**
-     * Logs a new user in
+     * Logs in a new user
      * @param username user's username
      * @param password user's password
      */
@@ -87,10 +97,19 @@ public class Client implements java.io.Closeable {
      * on a LOGIN request.
      * The callback must expect a JSONObject object containing the server's response.
      * The response has an attribute "result" which will return either "SUCCESS" or "ERROR".
-     * Attributes in case of:
-     * "SUCCESS": null
-     * "ERROR":
-     *      String message - error message
+     * <p>Attributes in case of:</p>
+     * <ul>
+     *  <li>"SUCCESS":
+     *   <ul>
+     *    <li>null</li>
+     *   </ul>
+     *  </li>
+     *  <li>"ERROR":
+     *   <ul>
+     *    <li>String message - error message</li>
+     *   </ul>
+     *  </li>
+     * </ul>
      *
      * @param callback a lambda expression of the callback
      */
@@ -114,11 +133,19 @@ public class Client implements java.io.Closeable {
      * on a CREATE_CHAT request.
      * The callback must expect a JSONObject object containing the server's response.
      * The response has an attribute "result" which will return either "SUCCESS" or "ERROR".
-     * Attributes in case of:
-     * "SUCCESS":
-     *      int chat_id
-     * "ERROR":
-     *      String message - error message
+     * <p>Attributes in case of:</p>
+     * <ul>
+     *  <li>"SUCCESS":
+     *   <ul>
+     *    <li>int chat_id</li>
+     *   </ul>
+     *  </li>
+     *  <li>"ERROR":
+     *   <ul>
+     *    <li>String message - error message</li>
+     *   </ul>
+     *  </li>
+     * </ul>
      *
      * @param callback a lambda expression of the callback
      */
@@ -127,7 +154,7 @@ public class Client implements java.io.Closeable {
     }
 
     /**
-     * Joins the user to a chat with a given chat_id
+     * Joins the user to a chat
      * @param chatID id of the chat
      */
     public void joinChat(int chatID) {
@@ -144,10 +171,19 @@ public class Client implements java.io.Closeable {
      * on a JOIN_CHAT request.
      * The callback must expect a JSONObject object containing the server's response.
      * The response has an attribute "result" which will return either "SUCCESS" or "ERROR".
-     * Attributes in case of:
-     * "SUCCESS": null
-     * "ERROR":
-     *      String message - error message
+     * <p>Attributes in case of:</p>
+     * <ul>
+     *  <li>"SUCCESS":
+     *   <ul>
+     *    <li>null</li>
+     *   </ul>
+     *  </li>
+     *  <li>"ERROR":
+     *   <ul>
+     *    <li>String message - error message</li>
+     *   </ul>
+     *  </li>
+     * </ul>
      *
      * @param callback a lambda expression of the callback
      */
@@ -156,7 +192,7 @@ public class Client implements java.io.Closeable {
     }
 
     /**
-     * Sends a message to the given chat
+     * Sends a message into the given chat
      * @param content the content of the message
      * @param timeStamp the time the message was sent
      * @param chatID the id of the chat
@@ -177,10 +213,19 @@ public class Client implements java.io.Closeable {
      * on a SEND request.
      * The callback must expect a JSONObject object containing the server's response.
      * The response has an attribute "result" which will return either "SUCCESS" or "ERROR".
-     * Attributes in case of:
-     * "SUCCESS": null
-     * "ERROR":
-     *      String message - error message
+     * <p>Attributes in case of:</p>
+     * <ul>
+     *  <li>"SUCCESS":
+     *   <ul>
+     *    <li>null</li>
+     *   </ul>
+     *  </li>
+     *  <li>"ERROR":
+     *   <ul>
+     *    <li>String message - error message</li>
+     *   </ul>
+     *  </li>
+     * </ul>
      *
      * @param callback a lambda expression of the callback
      */
@@ -202,11 +247,19 @@ public class Client implements java.io.Closeable {
      * on a GET_CHATS request.
      * The callback must expect a JSONObject object containing the server's response.
      * The response has an attribute "result" which will return either "SUCCESS" or "ERROR".
-     * Attributes in case of:
-     * "SUCCESS":
-     *      JSONArray "chats" - integer ID's of all the accessible to user chats
-     * "ERROR":
-     *      String message - error message
+     * <p>Attributes in case of:</p>
+     * <ul>
+     *  <li>"SUCCESS":
+     *   <ul>
+     *    <li>JSONArray chats - integer array of ID's of all the accessible to user chats</li>
+     *   </ul>
+     *  </li>
+     *  <li>"ERROR":
+     *   <ul>
+     *    <li>String message - error message</li>
+     *   </ul>
+     *  </li>
+     * </ul>
      */
     public void addGetChatsOnResponseCallback(Consumer<JSONObject> callback) {
         this.responseManager.addGetChatsOnResponseCallback(callback);
@@ -227,15 +280,27 @@ public class Client implements java.io.Closeable {
      * on a GET_MESSAGES request.
      * The callback must expect a JSONObject object containing the server's response.
      * The response has an attribute "result" which will return either "SUCCESS" or "ERROR".
-     * Attributes in case of:
-     * "SUCCESS":
-     *      JSONArray "messages" - array of messages:
-     *            String time_stamp
-     *            String sender
-     *            String content
-     *            int chat_id
-     * "ERROR":
-     *      String message - error message
+     *
+     * <p>Attributes in case of:</p>
+     * <ul>
+     *  <li>"SUCCESS":
+     *   <ul>
+     *    <li>JSONArray messages - JSONObject array of messages:
+     *     <ul>
+     *      <li>String time_stamp</li>
+     *      <li>String sender</li>
+     *      <li>String content</li>
+     *      <li>int chat_id</li>
+     *     </ul>
+     *    </li>
+     *   </ul>
+     *  </li>
+     *  <li>"ERROR":
+     *   <ul>
+     *    <li>String message - error message</li>
+     *   </ul>
+     *  </li>
+     * </ul>
      */
     public void addGetMessagesOnResponseCallback(Consumer<JSONObject> callback) {
         this.responseManager.addGetMessagesOnResponseCallback(callback);
@@ -249,6 +314,14 @@ public class Client implements java.io.Closeable {
      *      String sender
      *      String content
      *      int chat_id
+     *
+     * <p>Attributes:</p>
+     * <ul>
+     *  <li>String time_stamp</li>
+     *  <li>String sender</li>
+     *  <li>String content</li>
+     *  <li>int chat_id</li>
+     * </ul>
      */
     public void addReceiveMessageCallback(Consumer<JSONObject> callback) {
         this.responseManager.addReceiveMessageCallback(callback);
