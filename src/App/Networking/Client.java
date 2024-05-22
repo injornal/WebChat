@@ -351,30 +351,30 @@ public class Client implements java.io.Closeable {
             client.setReceiveMessageCallback(System.out::println);
             client.addSendMessageOnResponseCallback(System.out::println);
             client.addCreateChatOnResponseCallback(System.out::println);
-            client.addJoinChatOnResponseCallback(System.out::println);
+            client.addJoinChatOnResponseCallback((a) -> System.out.println("HERE"));
             client.signUp("Connie", "1234");
             client.login("Connie", "1234");
             client.createChat();
-            client.joinChat(0);
+            client.joinChat(10);
             try(Client client1 = new Client()) {
                 TimeUnit.SECONDS.sleep(1);
                 client1.start("127.0.0.1", 8080);
-                client1.signUp("IVAN", "1234");
                 client1.addSignUpOnResponseCallback(System.out::println);
-                client1.login("IVAN", "1234");
+                client1.signUp("IVAN", "1234");
                 client1.addLoginOnResponseCallback(System.out::println);
-                client1.joinChat(0);
+                client1.login("IVAN", "1234");
                 client1.addJoinChatOnResponseCallback(System.out::println);
-                client1.sendMessage("Hello there", "0:00", 0);
+                client1.joinChat(0);
                 client1.addSendMessageOnResponseCallback(System.out::println);
+                client1.sendMessage("Hello there", "0:00", 0);
                 TimeUnit.SECONDS.sleep(1);
             }
-            client.createChat();
             client.addCreateChatOnResponseCallback(System.out::println);
             client.createChat();
             client.addCreateChatOnResponseCallback(System.out::println);
-            client.sendMessage("Hi Ivan", "0:00", 0);
+            client.createChat();
             client.addSendMessageOnResponseCallback(System.out::println);
+            client.sendMessage("Hi Ivan", "0:00", 0);
             TimeUnit.SECONDS.sleep(1);
         } catch (IOException | InterruptedException e) {
             throw new RuntimeException(e);

@@ -83,6 +83,7 @@ class ServerConnection implements Runnable, Closeable {
 
     private JSONObject joinChat(int chatID) {
         if (isNotLoggedIn()) return new JSONObject().put("result", "ERROR").put("message", "NOT_LOGGED_IN");
+        if (Server.chats.size() <= chatID) return new JSONObject().put("result", "ERROR").put("message", "CHAT_DOES_NOT_EXIST");
         return this.joinChat(Server.chats.get(chatID));
     }
 
