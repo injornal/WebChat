@@ -327,6 +327,19 @@ public class Client implements java.io.Closeable {
         this.responseManager.addReceiveMessageCallback(callback);
     }
 
+    /**
+     * Requests messages queued while the user is inactive
+     */
+    public void getQueuedMessages() {
+        this.responseManager.requestCounter.put("GET_QUEUED_MESSAGES",
+                this.responseManager.requestCounter.get("GET_QUEUED_MESSAGES") + 1);
+        this.writer.println(new JSONObject().put("action", "GET_QUEUED_MESSAGES"));
+    }
+
+    public void addGetQueuedMessagesOnResponseCallback(Consumer<JSONObject> callback) {
+        this.responseManager.addGetQueuedMessagesCallback(callback);
+    }
+
 
     public static void main(String[] args) {
         try(Client client = new Client()) {
@@ -367,7 +380,10 @@ public class Client implements java.io.Closeable {
             client.addJoinChatOnResponseCallback(System.out::println);
             client.addGetChatsOnResponseCallback(System.out::println);
             client.addGetMessagesOnResponseCallback(System.out::println);
+            client.addGetQueuedMessagesOnResponseCallback(System.out::println);
             client.login("IVAN", "1234");
+            client.getQueuedMessages();
+            client.getQueuedMessages();
             client.createChat();
             client.createChat();
             client.getChats();

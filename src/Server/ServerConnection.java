@@ -1,10 +1,12 @@
 package Server;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Queue;
 import java.util.stream.Collectors;
 
 
@@ -63,6 +65,7 @@ class ServerConnection implements Runnable, Closeable {
             case "JOIN_CHAT" -> this.joinChat(dataJSON.getInt("chat_id"));
             case "GET_CHATS" -> this.getChats();
             case "GET_MESSAGES" -> this.getMessages(dataJSON.getInt("chat_id"));
+            case "GET_QUEUED_MESSAGES" -> this.getQueuedMessages();
             default -> new JSONObject().put("result", "EXCEPTION").put("message", "WRONG_ACTION");
         };
         return result.put("action", dataJSON.getString("action"));
@@ -157,6 +160,14 @@ class ServerConnection implements Runnable, Closeable {
                         (message) -> message.toJSON()
                 ).collect(Collectors.toList())).put("result", "SUCCESS");
     }
+
+    private JSONObject getQueuedMessages() {
+        if (isNotLoggedIn()) return new JSONObject().put("result", "ERROR").put("message", "NOT_LOGGED_IN");
+        return new JSONObject().put("messages", this.user.getQueuedMessages().stream().map(
+                (message) -> message.toJSON()
+        ).collect(Collectors.toList())).put("result", "SUCCESS");
+    }
+
 
     private boolean isNotLoggedIn() {
         return this.user == null;

@@ -190,7 +190,7 @@ public class Test extends JFrame {
             new Message("hiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii hiiiii7", "sanjana", null, ABORT)
         );
         
-        Person person = new Person("chai", true);
-        new ChatDisplay(new Client(), chat, person);
+//        Person person = new Person("chai", true);
+//        new ChatDisplay(new Client(), chat, person);
     }
 }
