@@ -4,24 +4,21 @@ import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.function.Consumer;
 
-public class ResponseManager implements Runnable, java.io.Closeable {
+class ResponseManager implements Runnable, java.io.Closeable {
     private final BufferedReader reader;
     private final Thread thread;
-    private final ArrayList<Consumer<JSONObject>> signUpOnResponseCallbacks = new ArrayList<>();
-    private final ArrayList<Consumer<JSONObject>> loginOnResponseCallbacks = new ArrayList<>();
-    private final ArrayList<Consumer<JSONObject>> createChatOnResponseCallbacks = new ArrayList<>();
-    private final ArrayList<Consumer<JSONObject>> joinChatOnResponseCallbacks = new ArrayList<>();
-    private final ArrayList<Consumer<JSONObject>> sendMessageOnResponseCallbacks = new ArrayList<>();
-    private final ArrayList<Consumer<JSONObject>> receiveMessageCallbacks = new ArrayList<>();
-    private final ArrayList<Consumer<JSONObject>> getChatCallbacks = new ArrayList<>();
-    private final ArrayList<Consumer<JSONObject>> getMessagesCallbacks = new ArrayList<>();
-    private final ArrayList<Consumer<JSONObject>> getQueuedMessagesCallbacks = new ArrayList<>();
+    private final Queue<Consumer<JSONObject>> signUpOnResponseCallbacks = new LinkedList<>();
+    private final Queue<Consumer<JSONObject>> loginOnResponseCallbacks = new LinkedList<>();
+    private final Queue<Consumer<JSONObject>> createChatOnResponseCallbacks = new LinkedList<>();
+    private final Queue<Consumer<JSONObject>> joinChatOnResponseCallbacks = new LinkedList<>();
+    private final Queue<Consumer<JSONObject>> sendMessageOnResponseCallbacks = new LinkedList<>();
+    private final Queue<Consumer<JSONObject>> getChatCallbacks = new LinkedList<>();
+    private final Queue<Consumer<JSONObject>> getMessagesCallbacks = new LinkedList<>();
+    private final Queue<Consumer<JSONObject>> getQueuedMessagesCallbacks = new LinkedList<>();
+    private Consumer<JSONObject> receiveMessageCallback;
 
     protected final Map<String, Integer> requestCounter = Collections.synchronizedMap(new TreeMap<>() {{
         put("SIGN_UP", 0);
@@ -100,9 +97,7 @@ public class ResponseManager implements Runnable, java.io.Closeable {
     }
 
     private void signUp(JSONObject data) {
-        for (Consumer<JSONObject> callback : this.signUpOnResponseCallbacks) {
-            callback.accept(data);
-        }
+        this.signUpOnResponseCallbacks.remove().accept(data);
     }
 
     protected void addSignUpOnResponseCallback(Consumer<JSONObject> callback) {
@@ -110,9 +105,7 @@ public class ResponseManager implements Runnable, java.io.Closeable {
     }
 
     private void login(JSONObject data) {
-        for (Consumer<JSONObject> callback : this.loginOnResponseCallbacks) {
-            callback.accept(data);
-        }
+        this.loginOnResponseCallbacks.remove().accept(data);
     }
 
     protected void addLoginOnResponseCallback(Consumer<JSONObject> callback) {
@@ -120,9 +113,7 @@ public class ResponseManager implements Runnable, java.io.Closeable {
     }
 
     private void createChat(JSONObject data) {
-        for (Consumer<JSONObject> callback : this.createChatOnResponseCallbacks) {
-            callback.accept(data);
-        }
+        this.createChatOnResponseCallbacks.remove().accept(data);
     }
 
     protected void addCreateChatOnResponseCallback(Consumer<JSONObject> callback) {
@@ -130,9 +121,7 @@ public class ResponseManager implements Runnable, java.io.Closeable {
     }
 
     private void joinChat(JSONObject data) {
-        for (Consumer<JSONObject> callback : this.joinChatOnResponseCallbacks) {
-            callback.accept(data);
-        }
+        this.joinChatOnResponseCallbacks.remove().accept(data);
     }
 
     protected void addJoinChatOnResponseCallback(Consumer<JSONObject> callback) {
@@ -140,9 +129,7 @@ public class ResponseManager implements Runnable, java.io.Closeable {
     }
 
     private void sendMessage(JSONObject data) {
-        for (Consumer<JSONObject> callback : this.sendMessageOnResponseCallbacks) {
-            callback.accept(data);
-        }
+        this.sendMessageOnResponseCallbacks.remove().accept(data);
     }
 
     protected void addSendMessageOnResponseCallback(Consumer<JSONObject> callback) {
@@ -150,19 +137,15 @@ public class ResponseManager implements Runnable, java.io.Closeable {
     }
 
     private void receiveMessage(JSONObject data) {
-        for (Consumer<JSONObject> callback : this.receiveMessageCallbacks) {
-            callback.accept(data);
-        }
+        this.receiveMessageCallback.accept(data);
     }
 
-    protected void addReceiveMessageCallback(Consumer<JSONObject> callback) {
-        this.receiveMessageCallbacks.add(callback);
+    protected void setReceiveMessageCallback(Consumer<JSONObject> callback) {
+        this.receiveMessageCallback = callback;
     }
 
     protected void getChats(JSONObject data) {
-        for (Consumer<JSONObject> callback : this.getChatCallbacks) {
-            callback.accept(data);
-        }
+        this.getChatCallbacks.remove().accept(data);
     }
 
     protected void addGetChatsOnResponseCallback(Consumer<JSONObject> callback) {
@@ -170,9 +153,7 @@ public class ResponseManager implements Runnable, java.io.Closeable {
     }
 
     protected void getMessages(JSONObject data) {
-        for (Consumer<JSONObject> callback : this.getMessagesCallbacks) {
-            callback.accept(data);
-        }
+        this.getMessagesCallbacks.remove().accept(data);
     }
 
     protected void addGetMessagesOnResponseCallback(Consumer<JSONObject> callback) {
@@ -180,9 +161,7 @@ public class ResponseManager implements Runnable, java.io.Closeable {
     }
 
     protected void getQueuedMessages(JSONObject data) {
-        for (Consumer<JSONObject> callback : this.getQueuedMessagesCallbacks) {
-            callback.accept(data);
-        }
+        this.getQueuedMessagesCallbacks.remove().accept(data);
     }
 
     protected void addGetQueuedMessagesCallback(Consumer<JSONObject> callback) {

@@ -7,7 +7,9 @@ import java.net.Socket;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
-
+/**
+ * Provides the networking API for connecting and working with the Server
+ */
 public class Client implements java.io.Closeable {
     private PrintWriter writer;
     private Socket socket;
@@ -323,8 +325,8 @@ public class Client implements java.io.Closeable {
      *  <li>int chat_id</li>
      * </ul>
      */
-    public void addReceiveMessageCallback(Consumer<JSONObject> callback) {
-        this.responseManager.addReceiveMessageCallback(callback);
+    public void setReceiveMessageCallback(Consumer<JSONObject> callback) {
+        this.responseManager.setReceiveMessageCallback(callback);
     }
 
     /**
@@ -346,7 +348,7 @@ public class Client implements java.io.Closeable {
             client.start("127.0.0.1", 8080);
             client.addSignUpOnResponseCallback(System.out::println);
             client.addLoginOnResponseCallback(System.out::println);
-            client.addReceiveMessageCallback(System.out::println);
+            client.setReceiveMessageCallback(System.out::println);
             client.addSendMessageOnResponseCallback(System.out::println);
             client.addCreateChatOnResponseCallback(System.out::println);
             client.addJoinChatOnResponseCallback(System.out::println);
@@ -358,14 +360,21 @@ public class Client implements java.io.Closeable {
                 TimeUnit.SECONDS.sleep(1);
                 client1.start("127.0.0.1", 8080);
                 client1.signUp("IVAN", "1234");
+                client1.addSignUpOnResponseCallback(System.out::println);
                 client1.login("IVAN", "1234");
+                client1.addLoginOnResponseCallback(System.out::println);
                 client1.joinChat(0);
+                client1.addJoinChatOnResponseCallback(System.out::println);
                 client1.sendMessage("Hello there", "0:00", 0);
+                client1.addSendMessageOnResponseCallback(System.out::println);
                 TimeUnit.SECONDS.sleep(1);
             }
             client.createChat();
+            client.addCreateChatOnResponseCallback(System.out::println);
             client.createChat();
+            client.addCreateChatOnResponseCallback(System.out::println);
             client.sendMessage("Hi Ivan", "0:00", 0);
+            client.addSendMessageOnResponseCallback(System.out::println);
             TimeUnit.SECONDS.sleep(1);
         } catch (IOException | InterruptedException e) {
             throw new RuntimeException(e);
@@ -374,7 +383,7 @@ public class Client implements java.io.Closeable {
             client.start("127.0.0.1", 8080);
             client.addSignUpOnResponseCallback(System.out::println);
             client.addLoginOnResponseCallback(System.out::println);
-            client.addReceiveMessageCallback(System.out::println);
+            client.setReceiveMessageCallback(System.out::println);
             client.addSendMessageOnResponseCallback(System.out::println);
             client.addCreateChatOnResponseCallback(System.out::println);
             client.addJoinChatOnResponseCallback(System.out::println);
@@ -383,8 +392,6 @@ public class Client implements java.io.Closeable {
             client.addGetQueuedMessagesOnResponseCallback(System.out::println);
             client.login("IVAN", "1234");
             client.getQueuedMessages();
-            client.getQueuedMessages();
-            client.createChat();
             client.createChat();
             client.getChats();
             client.getMessages(0);
