@@ -7,16 +7,18 @@ import java.util.*;
 public class Chat {
     
     private int chatID;
-    ArrayList<Person> users = new ArrayList<>();
-    ArrayList<Message> messages = new ArrayList<>();
+    ArrayList<Person> users = new ArrayList<Person>();
+    ArrayList<Message> messages = new ArrayList<Message>();
 
-    public Chat(int chatID){
+    public Chat(int chatID) {
         this.chatID = chatID;
     }
 
-    //new chat no paramters
     public int getChatID(){
         return chatID;
+    }
+    public void setChatID(int id) {
+        chatID = id;
     }
 
     public void joinChat(Person p){

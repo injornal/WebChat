@@ -4,8 +4,6 @@ import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.Serializable;
-import java.util.ArrayList;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -18,7 +16,6 @@ import javax.swing.JTextField;
 import org.json.JSONArray;
 
 import javax.swing.JPasswordField;
-import GUI.Components.Chat;
 import GUI.Components.Person;
 import App.Networking.Client;
 
@@ -27,8 +24,6 @@ public class LoginWindow extends JFrame {
     private JTextField user;
     private JPasswordField pass;
     private JButton loginButton;
-    private ChatsWindow chatsWindow;
-    private Person person;
     private App.Networking.Client client;
 
     public LoginWindow(Client client) {
@@ -62,9 +57,6 @@ public class LoginWindow extends JFrame {
         setVisible(true);
     }
     
-    public void setChatsWindow(ChatsWindow chatsWindow) {
-        this.chatsWindow = chatsWindow;
-    }
     private boolean isAlpha(String s) {
         String alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
         for (int c = 0; c < s.length(); c++) {
@@ -86,48 +78,53 @@ public class LoginWindow extends JFrame {
     private JPasswordField getPassField() {
         return pass;
     }
-    private void setPerson(Person person) {
-        this.person = person;
+    
+    private void login(LoginWindow frame) {
+        String u = user.getText();
+        String p = "";
+        char[] cList = pass.getPassword();
+        for (char c : cList) {
+            p += c;
+        }
+        client.addLoginOnResponseCallback((a) ->
+        {
+            String loginResult = a.getString("result");
+            System.out.println("login result: " + loginResult);
+            if (loginResult.equals("SUCCESS")) {
+                frame.setVisible(false);
+                //if (save stat exists) {
+                //  File f = save state;
+                //  FileInputStream fis = new FileInputStream(f);
+                //  ObjectInputStream ois = new ObjectInputStream(fis);
+                //  new ChatsWindow((ChatsWindow) ois.readObject());
+                //}
+                //else {
+                    new ChatsWindow(client, new Person(frame.getUserField().getText()));
+                //}
+            }
+            else {
+                JOptionPane loginPane = new JOptionPane("Login Fail");
+                loginPane.showMessageDialog(null, "Login Fail");
+                loginPane.setBorder(BorderFactory.createEmptyBorder(30,30,10,30));
+                frame.getUserField().setText("");
+                frame.getPassField().setText("");
+            }
+        });
+        client.login(u, p);
     }
-
     private class LoginButton implements ActionListener {
         private LoginWindow frame;
         public LoginButton(LoginWindow frame) {
             this.frame = frame;
         }
         public void actionPerformed(ActionEvent e) {
-            String u = user.getText();
-            String p = "";
-            char[] cList = pass.getPassword();
-            for (char c : cList) {
-                p += c;
-            }
-            client.login(u, p);
-            client.addLoginOnResponseCallback((a) ->
-            {
-                String loginResult = a.getString("result");
-                if (loginResult.equals("SUCCESS")) {
-                    ArrayList<Integer> chatIDs = new ArrayList<Integer>();
-                    client.getChats();
-                    client.addGetChatsOnResponseCallback((b) -> {
-                        JSONArray result = a.getJSONArray("chats");
-                        for (int i = 0; i < result.length(); i++) {
-                            chatIDs.add((int) result.get(i));
-                        }
-                        person.setChatIDs(chatIDs);
-                    });
-                    frame.setVisible(false);
-                    frame.setPerson(new Person(frame.getUserField().getText()));
-                    frame.setChatsWindow(new ChatsWindow(client, person));
-                }
-                else {
-                    JOptionPane loginPane = new JOptionPane("Login Fail");
-                    loginPane.showMessageDialog(null, "Login Fail");
-                    loginPane.setBorder(BorderFactory.createEmptyBorder(30,30,10,30));
-                    frame.getUserField().setText("");
-                    frame.getPassField().setText("");
-                }
+            Person person = new Person(frame.getUserField().getText());
+            client.addGetChatsOnResponseCallback((a) -> {
+                JSONArray obj = a.getJSONArray("chats");
+                int[] ids = new int[obj.length()];
+                person.setChatIDs(ids);
             });
+            new ChatsWindow(client, person);
         }
     }
     private class SignUpButton implements ActionListener {
@@ -155,16 +152,13 @@ public class LoginWindow extends JFrame {
                 frame.getUserField().setText("");
                 frame.getPassField().setText("");
             }
-
             else {
-                client.signUp(u, p);
                 client.addSignUpOnResponseCallback((a) ->
                 {
                     String result = a.getString("result");
+                    System.out.println("sign up result: " + result);
                     if (result.equals("SUCCESS")) {
-                        JOptionPane signUpPane = new JOptionPane("Sign Up Success");
-                        signUpPane.showMessageDialog(null, "Sign Up Success");
-                        signUpPane.setBorder(BorderFactory.createEmptyBorder(30,30,10,30));
+                        login(frame);
                     }
                     else {
                         JOptionPane signUpFail = new JOptionPane("User Already Exists");
@@ -173,6 +167,7 @@ public class LoginWindow extends JFrame {
                         frame.getPassField().setText("");
                     }
                 });
+                client.signUp(u, p);
             }
         }
     }
