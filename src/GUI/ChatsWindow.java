@@ -26,7 +26,6 @@ import org.json.JSONArray;
 
 import javax.swing.JPasswordField;
 
-import server.Message;
 import app.networking.Client;
 import gui.components.Chat;
 import gui.components.Person;
