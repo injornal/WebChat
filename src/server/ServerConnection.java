@@ -1,12 +1,10 @@
 package server;
 
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.Queue;
 import java.util.stream.Collectors;
 
 /**
@@ -100,9 +98,9 @@ class ServerConnection implements Runnable, Closeable {
         if (isNotLoggedIn())
             return new JSONObject().put("result", "ERROR").put("message", "NOT_LOGGED_IN");
         Chat chat = new Chat();
-        Server.chats.add(chat);
+        server.chats.add(chat);
         this.joinChat(chat);
-        int chatID = Server.chats.indexOf(chat);
+        int chatID = server.chats.indexOf(chat);
         return new JSONObject().put("result", "SUCCESS").put("chat_id", chatID);
         // TODO think about the structure to reduce O(N) calls
     }
@@ -114,8 +112,8 @@ class ServerConnection implements Runnable, Closeable {
      */
     private JSONObject joinChat(int chatID) {
         if (isNotLoggedIn()) return new JSONObject().put("result", "ERROR").put("message", "NOT_LOGGED_IN");
-        if (Server.chats.size() <= chatID) return new JSONObject().put("result", "ERROR").put("message", "CHAT_DOES_NOT_EXIST");
-        return this.joinChat(Server.chats.get(chatID));
+        if (server.chats.size() <= chatID) return new JSONObject().put("result", "ERROR").put("message", "CHAT_DOES_NOT_EXIST");
+        return this.joinChat(server.chats.get(chatID));
     }
 
     /**
@@ -141,13 +139,13 @@ class ServerConnection implements Runnable, Closeable {
         if (isNotLoggedIn())
             return new JSONObject().put("result", "ERROR").put("message", "NOT_LOGGED_IN");
         int chatID = data.getInt("chat_id");
-        if (Server.chats.size() <= chatID)
+        if (server.chats.size() <= chatID)
             return new JSONObject().put("result", "ERROR").put("message", "CHAT_DOES_NOT_EXIST");
-        Chat chat = Server.chats.get(chatID);
+        Chat chat = server.chats.get(chatID);
         Message message = new Message(
                 data.getString("content"), this.user.getUsername(),
                 data.getString("time_stamp"), chatID);
-        Server.chats.get(chatID).receiveMessage(message);
+        server.chats.get(chatID).receiveMessage(message);
         for (User user : chat.getUsers()) {
             if (user != this.user)
                 user.receiveMessage(message);
@@ -171,11 +169,11 @@ class ServerConnection implements Runnable, Closeable {
     private JSONObject signUp(JSONObject data) {
         String username = data.getString("username");
         String password = data.getString("password");
-        if (Server.users.containsKey(username)) {
+        if (server.users.containsKey(username)) {
             return new JSONObject().put("result", "ERROR").put("message", "USER_ALREADY_EXISTS");
         }
         User user = new User(username, password);
-        Server.users.put(username, user);
+        server.users.put(username, user);
         return new JSONObject().put("result", "SUCCESS");
     }
 
@@ -189,8 +187,8 @@ class ServerConnection implements Runnable, Closeable {
             return new JSONObject().put("result", "ERROR").put("message", "ALREADY_LOGGED_IN");
         String username = data.getString("username");
         User user;
-        if (Server.users.containsKey(username)) {
-            user = Server.users.get(username);
+        if (server.users.containsKey(username)) {
+            user = server.users.get(username);
         } else {
             return new JSONObject().put("result", "ERROR").put("message", "USER_DOES_NOT_EXIST");
         }
@@ -210,8 +208,8 @@ class ServerConnection implements Runnable, Closeable {
         if (isNotLoggedIn())
             return new JSONObject().put("result", "ERROR").put("message", "NOT_LOGGED_IN");
         ArrayList<Integer> userChats = new ArrayList<>();
-        for (int i = 0; i < Server.chats.size(); i++) {
-            if (Server.chats.get(i).containsUser(this.user)) {
+        for (int i = 0; i < server.chats.size(); i++) {
+            if (server.chats.get(i).containsUser(this.user)) {
                 userChats.add(i);
             }
         }
@@ -227,7 +225,7 @@ class ServerConnection implements Runnable, Closeable {
         if (isNotLoggedIn())
             return new JSONObject().put("result", "ERROR").put("message", "NOT_LOGGED_IN");
         return new JSONObject().put("messages",
-                Server.chats.get(chatID).getMessages().stream().map(
+                server.chats.get(chatID).getMessages().stream().map(
                         (message) -> message.toJSON()).collect(Collectors.toList()))
                 .put("result", "SUCCESS");
     }
