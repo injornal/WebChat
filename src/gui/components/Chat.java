@@ -2,8 +2,6 @@ package gui.components;
 
 import java.util.*;
 
-import server.Message;
-
 /**
  * A chat with its chatID list of users, and list of messages
  * 
@@ -14,13 +12,6 @@ import server.Message;
  */
 public class Chat {
     private int chatID;
-    private ArrayList<Message> messages = new ArrayList<Message>();
-
-    private int chatID;
-    /**
-     * users
-     */
-    ArrayList<Person> users = new ArrayList<>();
     /**
      * messages
      */
@@ -34,10 +25,10 @@ public class Chat {
     public Chat(int chatID) {
         this.chatID = chatID;
     }
-    public Chat(int chatID, JSONArray messages) {
+    public Chat(int chatID, ArrayList<Message> messages) {
         this.chatID = chatID;
         ArrayList<Message> msgs = new ArrayList<Message>();
-        for (int i = 0; i < messages.length(); i++) {
+        for (int i = 0; i < messages.size(); i++) {
             msgs.add((Message) messages.getJSONObject(i));
         }
         this.messages = msgs;
@@ -47,15 +38,6 @@ public class Chat {
     }
     public void setChatID(int id) {
         chatID = id;
-    }
-
-    /**
-     * Adds a Person to the chat
-     * 
-     * @param p Person being added
-     */
-    public void joinChat(Person p) {
-        users.add(p);
     }
 
     /**
@@ -75,23 +57,4 @@ public class Chat {
     public void receiveMessage(Message m) {
         messages.add(m);
     }
-
-    /**
-     * Get users in a chat
-     * 
-     * @return List of users
-     */
-    public ArrayList<Person> getUsers() {
-        return users;
-    }
-
-    /**
-     * Check if user exists
-     * 
-     * @return true or false
-     */
-    public boolean exists() {
-        return users.size() != 0;
-    }
-
 }
