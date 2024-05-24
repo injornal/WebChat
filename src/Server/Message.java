@@ -2,7 +2,7 @@ package Server;
 
 import org.json.JSONObject;
 
-public class Message {
+class Message {
     private final String content;
     private final String sender;
     private final String timeStamp;

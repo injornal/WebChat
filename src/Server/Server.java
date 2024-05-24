@@ -5,7 +5,7 @@ import java.net.ServerSocket;
 import java.util.*;
 
 
-class Server implements Closeable{
+public class Server implements Closeable{
     private boolean running;
     private int port;
     protected static final Map<String, User> users = Collections.synchronizedMap(new TreeMap<>() {{
