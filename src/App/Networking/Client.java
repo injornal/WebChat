@@ -1,4 +1,4 @@
-package App.Networking;
+package app.networking;
 
 import org.json.JSONObject;
 
@@ -9,12 +9,22 @@ import java.util.function.Consumer;
 
 /**
  * Provides the networking API for connecting and working with the Server
+ * 
+ * @author Chaitanya
+ * @author Kostiantyn
+ * @author Pranav
+ * @version 1.0
  */
-public class Client implements java.io.Closeable {
+public class Client implements Closeable {
     private PrintWriter writer;
     private Socket socket;
     private ResponseManager responseManager;
 
+    public enum RequestType {
+        SIGN_UP, LOGIN, CREATE_CHAT,
+        JOIN_CHAT, SEND_MESSAGE, GET_CHATS,
+        GET_MESSAGES, GET_QUEUED_MESSAGES
+    }
 
     /**
      * Start the client.
@@ -33,6 +43,9 @@ public class Client implements java.io.Closeable {
     }
 
     @Override
+    /**
+     * close
+     */
     public void close() throws IOException {
         this.socket.close();
         this.responseManager.close();
@@ -51,6 +64,11 @@ public class Client implements java.io.Closeable {
             put("password", password);
         }};
         this.writer.println(request);
+    }
+
+    public void signUp(String username, String password, Consumer<JSONObject> callback) {
+        this.responseManager.addCallback(RequestType.SIGN_UP, callback);
+        this.signUp(username, password);
     }
 
     /**
@@ -94,6 +112,11 @@ public class Client implements java.io.Closeable {
         this.writer.println(request);
     }
 
+    public void login(String username, String password, Consumer<JSONObject> callback) {
+        this.responseManager.addCallback(RequestType.LOGIN ,callback);
+        this.login(username, password);
+    }
+
     /**
      * Sets a callback function which will be called after the server's response
      * on a LOGIN request.
@@ -128,6 +151,11 @@ public class Client implements java.io.Closeable {
             put("action", "CREATE_CHAT");
         }};
         this.writer.println(request);
+    }
+
+    public void createChat(Consumer<JSONObject> callback) {
+        this.responseManager.addCallback(RequestType.CREATE_CHAT ,callback);
+        this.createChat();
     }
 
     /**
@@ -166,6 +194,11 @@ public class Client implements java.io.Closeable {
             put("chat_id", chatID);
         }};
         this.writer.println(request);
+    }
+
+    public void joinChat(int chatID, Consumer<JSONObject> callback) {
+        this.responseManager.addCallback(RequestType.JOIN_CHAT, callback);
+        this.joinChat(chatID);
     }
 
     /**
@@ -210,6 +243,11 @@ public class Client implements java.io.Closeable {
         this.writer.println(request);
     }
 
+    public void sendMessage(String content, String timeStamp, int chatID, Consumer<JSONObject> callback) {
+        this.responseManager.addCallback(RequestType.SEND_MESSAGE, callback);
+        this.sendMessage(content, timeStamp, chatID);
+    }
+
     /**
      * Sets a callback function which will be called after the server's response
      * on a SEND request.
@@ -244,6 +282,11 @@ public class Client implements java.io.Closeable {
         this.writer.println(new JSONObject().put("action", "GET_CHATS"));
     }
 
+    public void getChats(Consumer<JSONObject> callback) {
+        this.responseManager.addCallback(RequestType.GET_CHATS, callback);
+        this.getChats();
+    }
+
     /**
      * Sets a callback function which will be called after the server's response
      * on a GET_CHATS request.
@@ -262,6 +305,7 @@ public class Client implements java.io.Closeable {
      *   </ul>
      *  </li>
      * </ul>
+     * @param callback callback
      */
     public void addGetChatsOnResponseCallback(Consumer<JSONObject> callback) {
         this.responseManager.addGetChatsOnResponseCallback(callback);
@@ -275,6 +319,11 @@ public class Client implements java.io.Closeable {
     {
         this.responseManager.requestCounter.put("GET_MESSAGES", this.responseManager.requestCounter.get("GET_MESSAGES") + 1);
         this.writer.println(new JSONObject().put("action", "GET_MESSAGES").put("chat_id", chatID));
+    }
+
+    public void getMessages(int chatID, Consumer<JSONObject> callback) {
+        this.responseManager.addCallback(RequestType.GET_MESSAGES, callback);
+        this.getMessages(chatID);
     }
 
     /**
@@ -303,6 +352,7 @@ public class Client implements java.io.Closeable {
      *   </ul>
      *  </li>
      * </ul>
+     * @param callback callback
      */
     public void addGetMessagesOnResponseCallback(Consumer<JSONObject> callback) {
         this.responseManager.addGetMessagesOnResponseCallback(callback);
@@ -324,6 +374,7 @@ public class Client implements java.io.Closeable {
      *  <li>String content</li>
      *  <li>int chat_id</li>
      * </ul>
+     * @param callback callback
      */
     public void setReceiveMessageCallback(Consumer<JSONObject> callback) {
         this.responseManager.setReceiveMessageCallback(callback);
@@ -338,63 +389,60 @@ public class Client implements java.io.Closeable {
         this.writer.println(new JSONObject().put("action", "GET_QUEUED_MESSAGES"));
     }
 
+    /**
+     * add get queued messages
+     * @param callback callback
+     */
+    public void getQueuedMessages(Consumer<JSONObject> callback) {
+        this.responseManager.addCallback(RequestType.GET_QUEUED_MESSAGES, callback);
+        this.getQueuedMessages();
+    }
+
     public void addGetQueuedMessagesOnResponseCallback(Consumer<JSONObject> callback) {
         this.responseManager.addGetQueuedMessagesCallback(callback);
     }
 
+    public void addCallback(RequestType requestType, Consumer<JSONObject> callback) {
+        this.responseManager.addCallback(requestType, callback);
+    }
 
+    /**
+     * main
+     * @param args args
+     */
     public static void main(String[] args) {
         try(Client client = new Client()) {
             client.start("127.0.0.1", 8080);
-            client.addSignUpOnResponseCallback(System.out::println);
-            client.addLoginOnResponseCallback(System.out::println);
             client.setReceiveMessageCallback(System.out::println);
-            client.addSendMessageOnResponseCallback(System.out::println);
-            client.addCreateChatOnResponseCallback(System.out::println);
-            client.addJoinChatOnResponseCallback((a) -> System.out.println("HERE"));
-            client.signUp("Connie", "1234");
-            client.login("Connie", "1234");
-            client.createChat();
-            client.joinChat(10);
+            client.signUp("Connie", "1234", System.out::println);
+            client.login("Connie", "1234", System.out::println);
+            client.createChat(System.out::println);
+            client.joinChat(0, System.out::println);
             try(Client client1 = new Client()) {
                 TimeUnit.SECONDS.sleep(1);
                 client1.start("127.0.0.1", 8080);
-                client1.addSignUpOnResponseCallback(System.out::println);
-                client1.signUp("IVAN", "1234");
-                client1.addLoginOnResponseCallback(System.out::println);
-                client1.login("IVAN", "1234");
-                client1.addJoinChatOnResponseCallback(System.out::println);
-                client1.joinChat(0);
-                client1.addSendMessageOnResponseCallback(System.out::println);
-                client1.sendMessage("Hello there", "0:00", 0);
+                client1.setReceiveMessageCallback(System.out::println);
+                client1.signUp("IVAN", "1234", System.out::println);
+                client1.login("IVAN", "1234", System.out::println);
+                client1.joinChat(0, System.out::println);
+                client1.sendMessage("Hello there", "0:00", 0, System.out::println);
                 TimeUnit.SECONDS.sleep(1);
             }
-            client.addCreateChatOnResponseCallback(System.out::println);
-            client.createChat();
-            client.addCreateChatOnResponseCallback(System.out::println);
-            client.createChat();
-            client.addSendMessageOnResponseCallback(System.out::println);
-            client.sendMessage("Hi Ivan", "0:00", 0);
+            client.createChat(System.out::println);
+            client.createChat(System.out::println);
+            client.sendMessage("Hi Ivan", "0:00", 0, System.out::println);
             TimeUnit.SECONDS.sleep(1);
         } catch (IOException | InterruptedException e) {
             throw new RuntimeException(e);
         }
         try(Client client = new Client()) {
             client.start("127.0.0.1", 8080);
-            client.addSignUpOnResponseCallback(System.out::println);
-            client.addLoginOnResponseCallback(System.out::println);
             client.setReceiveMessageCallback(System.out::println);
-            client.addSendMessageOnResponseCallback(System.out::println);
-            client.addCreateChatOnResponseCallback(System.out::println);
-            client.addJoinChatOnResponseCallback(System.out::println);
-            client.addGetChatsOnResponseCallback(System.out::println);
-            client.addGetMessagesOnResponseCallback(System.out::println);
-            client.addGetQueuedMessagesOnResponseCallback(System.out::println);
-            client.login("IVAN", "1234");
-            client.getQueuedMessages();
-            client.createChat();
-            client.getChats();
-            client.getMessages(0);
+            client.login("IVAN", "1234", System.out::println);
+            client.getQueuedMessages(System.out::println);
+            client.createChat(System.out::println);
+            client.getChats(System.out::println);
+            client.getMessages(0, System.out::println);
             TimeUnit.SECONDS.sleep(1);
         } catch (IOException | InterruptedException e) {
             throw new RuntimeException(e);

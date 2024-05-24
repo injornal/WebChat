@@ -1,4 +1,5 @@
-package GUI;
+package gui;
+
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridLayout;
@@ -25,33 +26,58 @@ import org.json.JSONArray;
 
 import javax.swing.JPasswordField;
 
-import App.Networking.Client;
-import GUI.Components.Chat;
-import GUI.Components.Person;
-import Server.Message;
+import server.Message;
+import app.networking.Client;
+import gui.components.Chat;
+import gui.components.Person;
 
+/**
+ * Displays the different clickable chats
+ * 
+ * @author Chaitanya
+ * @author Kostiantyn
+ * @author Pranav
+ * @version 1.0
+ */
 public class ChatsWindow extends JFrame implements Serializable {
+    /**
+     * 
+     */
     private JPanel panel;
-    private App.Networking.Client client;
+    /**
+     * 
+     */
+    private app.networking.Client client;
+    /**
+     * 
+     */
     private JButton[] JButtons;
+    /**
+     * 
+     */
     private ChatDisplay[] displays = new ChatDisplay[7];
     private Person person;
 
+    /**
+     * Creates a new window
+     * 
+     * @param client client
+     * @param person Person using the window
+     */
     public ChatsWindow(Client client, Person person) {
         this.client = client;
         this.person = person;
 
         panel = new JPanel();
-        panel.setBorder(BorderFactory.createEmptyBorder(30,30,10,30));
-        panel.setLayout(new GridLayout(2,4));
+        panel.setBorder(BorderFactory.createEmptyBorder(30, 30, 10, 30));
+        panel.setLayout(new GridLayout(2, 4));
         setMinimumSize(new Dimension(600, 300));
         setMaximumSize(new Dimension(600, 300));
         JButtons = new JButton[7];
         for (int i = 0; i < 7; i++) {
             if (person.exists(i)) {
                 JButtons[i] = new JButton("" + person.getChatIds()[i]);
-            }
-            else {
+            } else {
                 JButtons[i] = new JButton("New Chat");
             }
             JButtons[i].addActionListener(new ClickChat(this, i));
@@ -87,10 +113,12 @@ public class ChatsWindow extends JFrame implements Serializable {
     private class ClickChat implements ActionListener {
         private ChatsWindow frame;
         private int index;
+
         public ClickChat(ChatsWindow frame, int index) {
             this.frame = frame;
             this.index = index;
         }
+
         public void actionPerformed(ActionEvent e) {
             System.out.println();
             System.out.println("clicked");
@@ -225,9 +253,11 @@ public class ChatsWindow extends JFrame implements Serializable {
     }
     private class Logout implements ActionListener {
         private ChatsWindow frame;
+
         public Logout(ChatsWindow frame) {
             this.frame = frame;
         }
+
         public void actionPerformed(ActionEvent e) {
             frame.dispose();
             System.out.println("logged out");

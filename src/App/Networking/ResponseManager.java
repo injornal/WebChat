@@ -1,4 +1,4 @@
-package App.Networking;
+package app.networking;
 
 import org.json.JSONObject;
 
@@ -7,18 +7,20 @@ import java.io.IOException;
 import java.util.*;
 import java.util.function.Consumer;
 
+/**
+ * Handles responses from client and server
+ * 
+ * @author Chaitanya
+ * @author Kostiantyn
+ * @author Pranav
+ * @version 1.0
+ */
 class ResponseManager implements Runnable, java.io.Closeable {
     private final BufferedReader reader;
     private final Thread thread;
-    private final Queue<Consumer<JSONObject>> signUpOnResponseCallbacks = new LinkedList<>();
-    private final Queue<Consumer<JSONObject>> loginOnResponseCallbacks = new LinkedList<>();
-    private final Queue<Consumer<JSONObject>> createChatOnResponseCallbacks = new LinkedList<>();
-    private final Queue<Consumer<JSONObject>> joinChatOnResponseCallbacks = new LinkedList<>();
-    private final Queue<Consumer<JSONObject>> sendMessageOnResponseCallbacks = new LinkedList<>();
-    private final Queue<Consumer<JSONObject>> getChatCallbacks = new LinkedList<>();
-    private final Queue<Consumer<JSONObject>> getMessagesCallbacks = new LinkedList<>();
-    private final Queue<Consumer<JSONObject>> getQueuedMessagesCallbacks = new LinkedList<>();
     private Consumer<JSONObject> receiveMessageCallback;
+
+    Map<Client.RequestType, Queue<Consumer<JSONObject>>> callbacks = Collections.synchronizedMap(new TreeMap<>());
 
     protected final Map<String, Integer> requestCounter = Collections.synchronizedMap(new TreeMap<>() {{
         put("SIGN_UP", 0);
@@ -32,6 +34,10 @@ class ResponseManager implements Runnable, java.io.Closeable {
     }});
 
 
+    /**
+     * Response manager
+     * @param reader reads
+     */
     protected ResponseManager(BufferedReader reader) {
         this.reader = reader;
         this.thread = new Thread(this);
@@ -39,6 +45,9 @@ class ResponseManager implements Runnable, java.io.Closeable {
     }
 
     @Override
+    /**
+     * run
+     */
     public void run() {
         try {
             String data;
@@ -49,13 +58,18 @@ class ResponseManager implements Runnable, java.io.Closeable {
                 }
                 this.parse(data);
             }
-        } catch (IOException ignore) {}
+        } catch (IOException ignore) {
+        }
     }
 
+    /**
+     * Parse
+     * @param data data
+     */
     private void parse(String data) {
         JSONObject dataJSON = new JSONObject(data);
 
-        if(!dataJSON.getString("action").equals("RECEIVE")) {
+        if (!dataJSON.getString("action").equals("RECEIVE")) {
             if (!this.requestCounter.containsKey(dataJSON.getString("action"))
                     || this.requestCounter.get(dataJSON.getString("action")) == 0) {
                 System.out.println("ERROR: UNEXPECTED SERVER RESPONSE: " + data);
@@ -96,80 +110,161 @@ class ResponseManager implements Runnable, java.io.Closeable {
         }
     }
 
+    /**
+     * sign up
+     * @param data data
+     */
     private void signUp(JSONObject data) {
-        this.signUpOnResponseCallbacks.remove().accept(data);
+        this.callbacks.get(Client.RequestType.SIGN_UP).remove().accept(data);
     }
 
+    /**
+     * add sign up
+     * @param callback callback
+     */
     protected void addSignUpOnResponseCallback(Consumer<JSONObject> callback) {
-        this.signUpOnResponseCallbacks.add(callback);
+        this.addCallback(Client.RequestType.SIGN_UP, callback);
     }
 
+    /**
+     * login
+     * @param data data
+     */
     private void login(JSONObject data) {
-        this.loginOnResponseCallbacks.remove().accept(data);
+        this.callbacks.get(Client.RequestType.LOGIN).remove().accept(data);
     }
 
+    /**
+     * add login
+     * @param callback callback
+     */
     protected void addLoginOnResponseCallback(Consumer<JSONObject> callback) {
-        this.loginOnResponseCallbacks.add(callback);
+        this.addCallback(Client.RequestType.LOGIN, callback);
     }
 
+    /**
+     * creat chat
+     * @param data data
+     */
     private void createChat(JSONObject data) {
-        this.createChatOnResponseCallbacks.remove().accept(data);
+        this.callbacks.get(Client.RequestType.CREATE_CHAT).remove().accept(data);
     }
 
+    /**
+     * Add create chat
+     * @param callback callback
+     */
     protected void addCreateChatOnResponseCallback(Consumer<JSONObject> callback) {
-        this.createChatOnResponseCallbacks.add(callback);
+        this.addCallback(Client.RequestType.CREATE_CHAT, callback);
     }
 
+    /**
+     * join chat
+     * @param data data
+     */
     private void joinChat(JSONObject data) {
-        this.joinChatOnResponseCallbacks.remove().accept(data);
+        this.callbacks.get(Client.RequestType.JOIN_CHAT).remove().accept(data);
     }
 
+    /**
+     * add join chat
+     * @param callback callback
+     */
     protected void addJoinChatOnResponseCallback(Consumer<JSONObject> callback) {
-        this.joinChatOnResponseCallbacks.add(callback);
+        this.addCallback(Client.RequestType.JOIN_CHAT, callback);
     }
 
+    /**
+     * send message
+     * @param data data
+     */
     private void sendMessage(JSONObject data) {
-        this.sendMessageOnResponseCallbacks.remove().accept(data);
+        this.callbacks.get(Client.RequestType.SEND_MESSAGE).remove().accept(data);
     }
 
+    /**
+     * add send message
+     * @param callback callback
+     */
     protected void addSendMessageOnResponseCallback(Consumer<JSONObject> callback) {
-        this.sendMessageOnResponseCallbacks.add(callback);
+        this.addCallback(Client.RequestType.SEND_MESSAGE, callback);
     }
 
+    /**
+     * recieve message
+     * @param data data
+     */
     private void receiveMessage(JSONObject data) {
         this.receiveMessageCallback.accept(data);
     }
 
+    /**
+     * Receive message callback
+     * @param callback callback
+     */
     protected void setReceiveMessageCallback(Consumer<JSONObject> callback) {
         this.receiveMessageCallback = callback;
     }
 
+    /**
+     * get chats
+     * @param data data
+     */
     protected void getChats(JSONObject data) {
-        this.getChatCallbacks.remove().accept(data);
+        this.callbacks.get(Client.RequestType.GET_CHATS).remove().accept(data);
     }
 
+    /**
+     * add get chats
+     * @param callback callback
+     */
     protected void addGetChatsOnResponseCallback(Consumer<JSONObject> callback) {
-        this.getChatCallbacks.add(callback);
+        this.addCallback(Client.RequestType.GET_CHATS, callback);
     }
 
+    /**
+     * Get mesages
+     * @param data data
+     */
     protected void getMessages(JSONObject data) {
-        this.getMessagesCallbacks.remove().accept(data);
+        this.callbacks.get(Client.RequestType.GET_MESSAGES).remove().accept(data);
     }
 
+    /**
+     * add get messages
+     * @param callback callback
+     */
     protected void addGetMessagesOnResponseCallback(Consumer<JSONObject> callback) {
-        this.getMessagesCallbacks.add(callback);
+        this.addCallback(Client.RequestType.GET_MESSAGES, callback);
     }
 
+    /**
+     * Get queued messages
+     * @param data data
+     */
     protected void getQueuedMessages(JSONObject data) {
-        this.getQueuedMessagesCallbacks.remove().accept(data);
+        this.callbacks.get(Client.RequestType.GET_QUEUED_MESSAGES).remove().accept(data);
     }
 
+    /**
+     * add get queued mesages
+     * @param callback callback
+     */
     protected void addGetQueuedMessagesCallback(Consumer<JSONObject> callback) {
-        this.getQueuedMessagesCallbacks.add(callback);
+        this.addCallback(Client.RequestType.GET_QUEUED_MESSAGES, callback);
     }
 
+    protected void addCallback(Client.RequestType requestType, Consumer<JSONObject> callback)
+    {
+        if (!this.callbacks.containsKey(requestType))
+            this.callbacks.put(requestType, new LinkedList<>());
+        this.callbacks.get(requestType).add(callback);
+    }
 
     @Override
+    /**
+     * close
+     */
     public void close() throws IOException {
         this.thread.interrupt();
     }
