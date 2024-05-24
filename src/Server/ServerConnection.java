@@ -1,4 +1,4 @@
-package Server;
+package server;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -9,7 +9,14 @@ import java.util.ArrayList;
 import java.util.Queue;
 import java.util.stream.Collectors;
 
-
+/**
+ * Server connection
+ * 
+ * @author Chaitanya
+ * @author Kostiantyn
+ * @author Pranav
+ * @version 1.0
+ */
 class ServerConnection implements Runnable, Closeable {
     private final PrintWriter writer;
     private final BufferedReader reader;
@@ -17,6 +24,10 @@ class ServerConnection implements Runnable, Closeable {
     private User user;
     private final Thread thread;
 
+    /**
+     * Server connection
+     * @param conn conn
+     */
     ServerConnection(Socket conn) {
         try {
             this.conn = conn;
@@ -30,6 +41,9 @@ class ServerConnection implements Runnable, Closeable {
     }
 
     @Override
+    /**
+     * Runs program
+     */
     public void run() {
         try {
             while (conn.isConnected()) {
@@ -41,7 +55,8 @@ class ServerConnection implements Runnable, Closeable {
                 this.writer.println(response);
                 System.out.println(response);
             }
-            if (this.user != null) this.user.disconnect();
+            if (this.user != null)
+                this.user.disconnect();
             this.user = null;
         } catch (Exception e) {
             try {
@@ -49,12 +64,18 @@ class ServerConnection implements Runnable, Closeable {
             } catch (IOException ex) {
                 throw new RuntimeException(ex);
             }
-            if (this.user != null) this.user.disconnect();
+            if (this.user != null)
+                this.user.disconnect();
             this.user = null;
             throw new RuntimeException(e);
         }
     }
 
+    /**
+     * executes
+     * @param data data
+     * @return JSON object
+     */
     private JSONObject execute(String data) {
         JSONObject dataJSON = new JSONObject(data);
         JSONObject result = switch (dataJSON.getString("action")) {
@@ -71,8 +92,13 @@ class ServerConnection implements Runnable, Closeable {
         return result.put("action", dataJSON.getString("action"));
     }
 
+    /**
+     * Creates chat
+     * @return JSON Object
+     */
     private JSONObject createChat() {
-        if (isNotLoggedIn()) return new JSONObject().put("result", "ERROR").put("message", "NOT_LOGGED_IN");
+        if (isNotLoggedIn())
+            return new JSONObject().put("result", "ERROR").put("message", "NOT_LOGGED_IN");
         Chat chat = new Chat();
         Server.chats.add(chat);
         this.joinChat(chat);
@@ -81,40 +107,67 @@ class ServerConnection implements Runnable, Closeable {
         // TODO think about the structure to reduce O(N) calls
     }
 
+    /**
+     * Joins chat
+     * @param chatID chat to be joined
+     * @return JSONObject
+     */
     private JSONObject joinChat(int chatID) {
-        if (isNotLoggedIn()) return new JSONObject().put("result", "ERROR").put("message", "NOT_LOGGED_IN");
+        if (isNotLoggedIn())
+            return new JSONObject().put("result", "ERROR").put("message", "NOT_LOGGED_IN");
         return this.joinChat(Server.chats.get(chatID));
     }
 
+    /**
+     * Join chat
+     * @param chat chat to be joined
+     * @return JSONObject
+     */
     private JSONObject joinChat(Chat chat) {
-        if (isNotLoggedIn()) return new JSONObject().put("result", "ERROR").put("message", "NOT_LOGGED_IN");
+        if (isNotLoggedIn())
+            return new JSONObject().put("result", "ERROR").put("message", "NOT_LOGGED_IN");
         if (chat == null)
             return new JSONObject().put("result", "ERROR").put("message", "CHAT_DOES_NOT_EXIST");
         chat.joinUser(this.user);
         return new JSONObject().put("result", "SUCCESS");
     }
 
+    /**
+     * Send message
+     * @param data message to be sent
+     * @return JSON Object
+     */
     private JSONObject sendMessage(JSONObject data) {
-        if (isNotLoggedIn()) return new JSONObject().put("result", "ERROR").put("message", "NOT_LOGGED_IN");
+        if (isNotLoggedIn())
+            return new JSONObject().put("result", "ERROR").put("message", "NOT_LOGGED_IN");
         int chatID = data.getInt("chat_id");
         if (Server.chats.size() <= chatID)
             return new JSONObject().put("result", "ERROR").put("message", "CHAT_DOES_NOT_EXIST");
         Chat chat = Server.chats.get(chatID);
         Message message = new Message(
                 data.getString("content"), this.user.getUsername(),
-                data.getString("time_stamp"), chatID
-        );
+                data.getString("time_stamp"), chatID);
         Server.chats.get(chatID).receiveMessage(message);
         for (User user : chat.getUsers()) {
-            if (user != this.user) user.receiveMessage(message);
+            if (user != this.user)
+                user.receiveMessage(message);
         }
         return new JSONObject().put("result", "SUCCESS");
     }
 
+    /**
+     * Receive message
+     * @param message message to be recieved
+     */
     public void receiveMessage(Message message) {
         writer.println(message.toJSON().put("action", "RECEIVE"));
     }
 
+    /**
+     * Signs up someone
+     * @param data data
+     * @return JSONObject
+     */
     private JSONObject signUp(JSONObject data) {
         String username = data.getString("username");
         String password = data.getString("password");
@@ -126,8 +179,14 @@ class ServerConnection implements Runnable, Closeable {
         return new JSONObject().put("result", "SUCCESS");
     }
 
+    /**
+     * Login
+     * @param data data
+     * @return JSONOBject
+     */
     private JSONObject login(JSONObject data) {
-        if (!isNotLoggedIn()) return new JSONObject().put("result", "ERROR").put("message", "ALREADY_LOGGED_IN");
+        if (!isNotLoggedIn())
+            return new JSONObject().put("result", "ERROR").put("message", "ALREADY_LOGGED_IN");
         String username = data.getString("username");
         User user;
         if (Server.users.containsKey(username)) {
@@ -138,12 +197,18 @@ class ServerConnection implements Runnable, Closeable {
         if (user.getPassword().equals(data.getString("password"))) {
             this.user = user;
             this.user.connect(this);
-        } else return new JSONObject().put("result", "ERROR").put("message", "WRONG_PASSWORD");
+        } else
+            return new JSONObject().put("result", "ERROR").put("message", "WRONG_PASSWORD");
         return new JSONObject().put("result", "SUCCESS");
     }
 
+    /**
+     * Get chats
+     * @return JSONOBject
+     */
     private JSONObject getChats() {
-        if (isNotLoggedIn()) return new JSONObject().put("result", "ERROR").put("message", "NOT_LOGGED_IN");
+        if (isNotLoggedIn())
+            return new JSONObject().put("result", "ERROR").put("message", "NOT_LOGGED_IN");
         ArrayList<Integer> userChats = new ArrayList<>();
         for (int i = 0; i < Server.chats.size(); i++) {
             if (Server.chats.get(i).containsUser(this.user)) {
@@ -153,27 +218,43 @@ class ServerConnection implements Runnable, Closeable {
         return new JSONObject().put("chats", userChats).put("result", "SUCCESS");
     }
 
+    /**
+     * Get messages
+     * @param chatID chat where the messages come from
+     * @return JSON Object
+     */
     private JSONObject getMessages(int chatID) {
-        if (isNotLoggedIn()) return new JSONObject().put("result", "ERROR").put("message", "NOT_LOGGED_IN");
+        if (isNotLoggedIn())
+            return new JSONObject().put("result", "ERROR").put("message", "NOT_LOGGED_IN");
         return new JSONObject().put("messages",
                 Server.chats.get(chatID).getMessages().stream().map(
-                        (message) -> message.toJSON()
-                ).collect(Collectors.toList())).put("result", "SUCCESS");
+                        (message) -> message.toJSON()).collect(Collectors.toList()))
+                .put("result", "SUCCESS");
     }
 
+    /**
+     * Get qued messages
+     * @return JSONObject
+     */
     private JSONObject getQueuedMessages() {
-        if (isNotLoggedIn()) return new JSONObject().put("result", "ERROR").put("message", "NOT_LOGGED_IN");
+        if (isNotLoggedIn())
+            return new JSONObject().put("result", "ERROR").put("message", "NOT_LOGGED_IN");
         return new JSONObject().put("messages", this.user.getQueuedMessages().stream().map(
-                (message) -> message.toJSON()
-        ).collect(Collectors.toList())).put("result", "SUCCESS");
+                (message) -> message.toJSON()).collect(Collectors.toList())).put("result", "SUCCESS");
     }
 
-
+    /**
+     * check if not logged in
+     * @return true or false
+     */
     private boolean isNotLoggedIn() {
         return this.user == null;
     }
 
     @Override
+    /**
+     * Closes
+     */
     public void close() throws IOException {
         this.thread.interrupt();
         this.user.disconnect();

@@ -1,4 +1,4 @@
-package App.Networking;
+package app.networking;
 
 import org.json.JSONObject;
 
@@ -9,8 +9,13 @@ import java.util.function.Consumer;
 
 /**
  * Provides the networking API for connecting and working with the Server
+ * 
+ * @author Chaitanya
+ * @author Kostiantyn
+ * @author Pranav
+ * @version 1.0
  */
-public class Client implements java.io.Closeable {
+public class Client implements Closeable {
     private PrintWriter writer;
     private Socket socket;
     private ResponseManager responseManager;
@@ -33,6 +38,9 @@ public class Client implements java.io.Closeable {
     }
 
     @Override
+    /**
+     * close
+     */
     public void close() throws IOException {
         this.socket.close();
         this.responseManager.close();
@@ -262,6 +270,7 @@ public class Client implements java.io.Closeable {
      *   </ul>
      *  </li>
      * </ul>
+     * @param callback callback
      */
     public void addGetChatsOnResponseCallback(Consumer<JSONObject> callback) {
         this.responseManager.addGetChatsOnResponseCallback(callback);
@@ -303,6 +312,7 @@ public class Client implements java.io.Closeable {
      *   </ul>
      *  </li>
      * </ul>
+     * @param callback callback
      */
     public void addGetMessagesOnResponseCallback(Consumer<JSONObject> callback) {
         this.responseManager.addGetMessagesOnResponseCallback(callback);
@@ -324,6 +334,7 @@ public class Client implements java.io.Closeable {
      *  <li>String content</li>
      *  <li>int chat_id</li>
      * </ul>
+     * @param callback callback
      */
     public void setReceiveMessageCallback(Consumer<JSONObject> callback) {
         this.responseManager.setReceiveMessageCallback(callback);
@@ -338,11 +349,19 @@ public class Client implements java.io.Closeable {
         this.writer.println(new JSONObject().put("action", "GET_QUEUED_MESSAGES"));
     }
 
+    /**
+     * add get queued messages
+     * @param callback callback
+     */
     public void addGetQueuedMessagesOnResponseCallback(Consumer<JSONObject> callback) {
         this.responseManager.addGetQueuedMessagesCallback(callback);
     }
 
 
+    /**
+     * main
+     * @param args args
+     */
     public static void main(String[] args) {
         try(Client client = new Client()) {
             client.start("127.0.0.1", 8080);

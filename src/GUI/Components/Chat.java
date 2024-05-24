@@ -1,41 +1,89 @@
-package GUI.Components;
-import Server.Message;
+package gui.components;
 
 import java.util.*;
 
+import server.Message;
 
+/**
+ * A chat with its chatID list of users, and list of messages
+ * 
+ * @author Chaitanya
+ * @author Kostiantyn
+ * @author Pranav
+ * @version 1.0
+ */
 public class Chat {
-    
+
     private int chatID;
+    /**
+     * users
+     */
     ArrayList<Person> users = new ArrayList<>();
+    /**
+     * messages
+     */
     ArrayList<Message> messages = new ArrayList<>();
 
-    public Chat(int chatID){
+    /**
+     * Make a new chat with chatID
+     * 
+     * @param chatID chatID
+     */
+    public Chat(int chatID) {
         this.chatID = chatID;
     }
 
-    //new chat no paramters
-    public int getChatID(){
+    /**
+     * Get ChatID
+     * 
+     * @return chatID
+     */
+    public int getChatID() {
         return chatID;
     }
 
-    public void joinChat(Person p){
+    /**
+     * Adds a Person to the chat
+     * 
+     * @param p Person being added
+     */
+    public void joinChat(Person p) {
         users.add(p);
     }
 
-    public ArrayList<Message> getMessages(){
+    /**
+     * Get messages in a chat
+     * 
+     * @return List of messages
+     */
+    public ArrayList<Message> getMessages() {
         return messages;
     }
 
+    /**
+     * Add messages to the chat
+     * 
+     * @param m message to be added
+     */
     public void receiveMessage(Message m) {
         messages.add(m);
     }
 
-    public ArrayList<Person> getUsers(){
+    /**
+     * Get users in a chat
+     * 
+     * @return List of users
+     */
+    public ArrayList<Person> getUsers() {
         return users;
     }
-    
-    public boolean exists(){
+
+    /**
+     * Check if user exists
+     * 
+     * @return true or false
+     */
+    public boolean exists() {
         return users.size() != 0;
     }
 

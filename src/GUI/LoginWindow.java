@@ -1,4 +1,4 @@
-package GUI;
+package gui;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridLayout;
@@ -18,19 +18,54 @@ import javax.swing.JTextField;
 import org.json.JSONArray;
 
 import javax.swing.JPasswordField;
-import GUI.Components.Chat;
-import GUI.Components.Person;
-import App.Networking.Client;
 
+import app.networking.Client;
+import gui.components.Chat;
+import gui.components.Person;
+
+/**
+ * Displays a login window that prompts the user to login or signup 
+ * by entering their username or password
+ * 
+ * @author Chaitanya
+ * @author Kostiantyn
+ * @author Pranav
+ * @version 1.0
+ */
 public class LoginWindow extends JFrame {
+    /**
+     * 
+     */
     private JPanel panel;
+    /**
+     * 
+     */
     private JTextField user;
+    /**
+     * 
+     */
     private JPasswordField pass;
+    /**
+     * 
+     */
     private JButton loginButton;
+    /**
+     * 
+     */
     private ChatsWindow chatsWindow;
+    /**
+     * 
+     */
     private Person person;
-    private App.Networking.Client client;
+    /**
+     * 
+     */
+    private app.networking.Client client;
 
+    /**
+     * Creates a new window
+     * @param client client
+     */
     public LoginWindow(Client client) {
         this.client = client;
         client.start("127.0.0.1", 8080);
@@ -62,6 +97,10 @@ public class LoginWindow extends JFrame {
         setVisible(true);
     }
     
+    /**
+     * Setting ChatsWindow
+     * @param chatsWindow chatswindow to be set
+     */
     public void setChatsWindow(ChatsWindow chatsWindow) {
         this.chatsWindow = chatsWindow;
     }
@@ -176,6 +215,10 @@ public class LoginWindow extends JFrame {
             }
         }
     }
+    /**
+     * main
+     * @param args args
+     */
     public static void main(String[] args) {
         new LoginWindow(new Client());
     }
