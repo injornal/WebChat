@@ -12,7 +12,7 @@ import java.util.*;
  * @author Pranav
  * @version 1.0
  */
-class Server implements Closeable {
+public class Server implements Closeable {
     private boolean running;
     private int port;
     /**

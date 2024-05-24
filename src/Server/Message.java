@@ -10,7 +10,7 @@ import org.json.JSONObject;
  * @author Pranav
  * @version 1.0
  */
-public class Message {
+class Message {
     private final String content;
     private final String sender;
     private final String timeStamp;
