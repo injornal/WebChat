@@ -1,4 +1,4 @@
-package app.Networking;
+package app.networking;
 
 import org.json.JSONObject;
 
