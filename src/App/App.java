@@ -21,8 +21,7 @@ public class App {
     public App(Client client) {
         this.client = client;
         client.start("127.0.0.1", 8080);
-        // Initialize Swing
-        // Run GUI app
+        new LoginWindow(client);
     }
 
     /**
@@ -30,6 +29,6 @@ public class App {
      * @param args args
      */
     public static void main(String[] args) {
-        App app = new App(new Client());
+        new App(new Client());
     }
 }

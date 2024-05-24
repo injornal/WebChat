@@ -6,6 +6,8 @@ import java.awt.GridLayout;
 import java.awt.TextArea;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.util.ArrayList;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -75,21 +77,19 @@ public class ChatDisplay extends JFrame {
      * @param person Person in the chat
      * @param window window
      */
-    public ChatDisplay(Client client, Chat chat, Person person, ChatsWindow window) {
+    public ChatDisplay(Client client, Chat chat, ChatsWindow window) {
         this.window = window;
         this.client = client;
-        client.start("127.0.0.1", 8080);
         this.chat = chat;
         this.messages = chat.getMessages();
-        this.person = person;
         setLayout(new GridLayout(2, 1));
 
         panel = new JPanel();
         panel.setBorder(BorderFactory.createEmptyBorder(30, 30, 10, 30));
         panel.setLayout(new GridLayout(1, 1));
         panel.setPreferredSize(new Dimension(500, 800));
-        panel.setMinimumSize(new Dimension(500, 700));
-        panel.setMaximumSize(new Dimension(500, 700));
+        panel.setMinimumSize(new Dimension(500, 800));
+        panel.setMaximumSize(new Dimension(500, 800));
 
         TextArea existingMsg = new TextArea(parseMessages());
         existingMsg.setEditable(false);
@@ -110,31 +110,30 @@ public class ChatDisplay extends JFrame {
         // newMsg.setMinimumSize(new Dimension(600, 183));
         // newMsg.setMaximumSize(new Dimension(600, 183));
         interactivePanel.add(newMsg);
+        newMsg.addKeyListener(new Send(this));
 
         JPanel buttons = new JPanel();
-        interactivePanel.setBorder(BorderFactory.createEmptyBorder(10, 30, 30, 30));
-        interactivePanel.setLayout(new GridLayout(2, 1));
-        // interactivePanel.setMinimumSize(new Dimension(600, 183));
-        // interactivePanel.setMaximumSize(new Dimension(600, 183));
+        interactivePanel.setBorder(BorderFactory.createEmptyBorder(10,30,30,30));
+        interactivePanel.setLayout(new GridLayout(2,1));
+        //interactivePanel.setMinimumSize(new Dimension(600, 183))
+        //interactivePanel.setMinimumSize(new Dimension(600, 183));
+        //interactivePanel.setMaximumSize(new Dimension(600, 183));
         interactivePanel.add(buttons);
 
-        JButton send = new JButton("Send");
-        send.addActionListener(new Send(this));
         JButton quit = new JButton("Quit");
         quit.addActionListener(new Quit(this));
-        buttons.add(send);
         buttons.add(quit);
 
         setMinimumSize(new Dimension(600, 983));
         setMaximumSize(new Dimension(600, 983));
         add(panel, BorderLayout.NORTH);
         add(interactivePanel, BorderLayout.SOUTH);
-        setTitle("" + chat.getChatID());
+        setTitle("Chat ID: " + chat.getChatID());
         pack();
         setVisible(true);
     }
 
-    private class Send implements ActionListener {
+    private class Send implements KeyListener {
         private ChatDisplay frame;
         private TextArea newMsg;
 
@@ -142,13 +141,21 @@ public class ChatDisplay extends JFrame {
             this.frame = frame;
             newMsg = frame.getNewMSG();
         }
-
-        public void actionPerformed(ActionEvent e) {
-            if (!newMsg.getText().equals("")) {
+        public void keyPressed(KeyEvent e) {
+            if (e.getKeyCode() == 10 && !newMsg.getText().equals("")) {
+                client.addSendMessageOnResponseCallback((a) -> {});
+                client.sendMessage(newMsg.getText(), "", chat.getChatID());
                 getExistingMsgs().setText(getExistingMsgs().getText() + frame.addMessage(
-                        new Message(newMsg.getText(), person.getName(), "", frame.getChat().getChatID())));
+                    new Message(newMsg.getText(), person.getName(), "", frame.getChat().getChatID())
+                ));
                 frame.getNewMSG().setText("");
             }
+        }
+        @Override
+        public void keyTyped(KeyEvent e) {
+        }
+        @Override
+        public void keyReleased(KeyEvent e) {
         }
     }
 
@@ -160,6 +167,7 @@ public class ChatDisplay extends JFrame {
         }
 
         public void actionPerformed(ActionEvent e) {
+            System.out.println("quit out of chat");
             frame.setVisible(false);
             frame.getWindow().setVisible(true);
         }
@@ -180,56 +188,7 @@ public class ChatDisplay extends JFrame {
     private TextArea getNewMSG() {
         return newMsg;
     }
-
-    /**
-     * Parse messages
-     * 
-     * @return String of messages
-     */
-    public String parseMessages() {
-        String result = "";
-        for (int i = 0; i < messages.size(); i++) {
-            result += addMessage(messages.get(i));
-        }
-        return result;
-    }
-
-    private String splitMessage(String s, String spaceBefore) {
-        String[] words = s.split(" "); // empty string for space
-        String result = spaceBefore;
-        int lineLength = 0;
-        for (String word : words) {
-            if (word.length() < 21) {
-                if (lineLength + word.length() < 21) {
-                    lineLength += word.length() + 1;
-                    result += (word + " ");
-                } else {
-                    lineLength = word.length() + 1;
-                    result += ("\n" + spaceBefore + word + " ");
-                }
-            } else {
-                while (word.length() > 20) {
-                    String subWord = word.substring(0, 21);
-                    word = word.substring(21);
-                    if (lineLength > 0) {
-                        result += "\n" + spaceBefore + subWord;
-                    } else {
-                        result += subWord;
-                        lineLength += 22;
-                    }
-                }
-                result += "\n" + spaceBefore + word;
-            }
-        }
-        return result;
-    }
-
-    /**
-     * Add message
-     * 
-     * @param m message to be added
-     * @return String with added message
-     */
+   
     public String addMessage(Message m) {
         int i = messages.indexOf(m);
         if (i == -1) {
@@ -261,6 +220,45 @@ public class ChatDisplay extends JFrame {
                 result += (halfwaySpace + content + "\n");
             } else {
                 result += splitMessage(content, halfwaySpace) + "\n";
+            }
+        }
+        return result;
+    }
+    private String parseMessages() {
+        String result = "";
+        for (int i = 0; i < messages.size(); i++) {
+            result += addMessage(messages.get(i));
+        }
+        return result;
+    }
+    private String splitMessage(String s, String spaceBefore) {
+        String[] words = s.split(" ");    //empty string for space
+        String result = spaceBefore;
+        int lineLength = 0;
+        for (String word : words) {
+            if (word.length() < 21) {
+                if (lineLength + word.length() < 21) {
+                    lineLength += word.length() + 1;
+                    result += (word + " ");
+                }
+                else {
+                    lineLength = word.length() + 1;
+                    result += ("\n" + spaceBefore + word + " ");
+                }
+            }
+            else {
+                while (word.length() > 20) {
+                    String subWord = word.substring(0, 21);
+                    word = word.substring(21);
+                    if (lineLength > 0) {
+                        result += "\n" + spaceBefore + subWord;
+                    }
+                    else {
+                        result += subWord;
+                        lineLength += 22;
+                    }
+                }
+                result += "\n" + spaceBefore + word;
             }
         }
         return result;

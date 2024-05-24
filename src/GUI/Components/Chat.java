@@ -41,6 +41,9 @@ public class Chat {
     public int getChatID() {
         return chatID;
     }
+    public void setChatID(int id) {
+        chatID = id;
+    }
 
     /**
      * Adds a Person to the chat
