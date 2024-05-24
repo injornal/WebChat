@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 
 /**
  * Server connection
- * 
+ *
  * @author Chaitanya
  * @author Kostiantyn
  * @author Pranav
@@ -38,10 +38,10 @@ class ServerConnection implements Runnable, Closeable {
         }
     }
 
-    @Override
     /**
      * Runs program
      */
+    @Override
     public void run() {
         try {
             while (conn.isConnected()) {
@@ -70,7 +70,7 @@ class ServerConnection implements Runnable, Closeable {
     }
 
     /**
-     * executes
+     * Executes a client's request
      * @param data data
      * @return JSON object
      */
@@ -98,9 +98,9 @@ class ServerConnection implements Runnable, Closeable {
         if (isNotLoggedIn())
             return new JSONObject().put("result", "ERROR").put("message", "NOT_LOGGED_IN");
         Chat chat = new Chat();
-        server.chats.add(chat);
+        Server.chats.add(chat);
         this.joinChat(chat);
-        int chatID = server.chats.indexOf(chat);
+        int chatID = Server.chats.indexOf(chat);
         return new JSONObject().put("result", "SUCCESS").put("chat_id", chatID);
         // TODO think about the structure to reduce O(N) calls
     }
@@ -112,8 +112,8 @@ class ServerConnection implements Runnable, Closeable {
      */
     private JSONObject joinChat(int chatID) {
         if (isNotLoggedIn()) return new JSONObject().put("result", "ERROR").put("message", "NOT_LOGGED_IN");
-        if (server.chats.size() <= chatID) return new JSONObject().put("result", "ERROR").put("message", "CHAT_DOES_NOT_EXIST");
-        return this.joinChat(server.chats.get(chatID));
+        if (Server.chats.size() <= chatID) return new JSONObject().put("result", "ERROR").put("message", "CHAT_DOES_NOT_EXIST");
+        return this.joinChat(Server.chats.get(chatID));
     }
 
     /**
@@ -139,13 +139,13 @@ class ServerConnection implements Runnable, Closeable {
         if (isNotLoggedIn())
             return new JSONObject().put("result", "ERROR").put("message", "NOT_LOGGED_IN");
         int chatID = data.getInt("chat_id");
-        if (server.chats.size() <= chatID)
+        if (Server.chats.size() <= chatID)
             return new JSONObject().put("result", "ERROR").put("message", "CHAT_DOES_NOT_EXIST");
-        Chat chat = server.chats.get(chatID);
+        Chat chat = Server.chats.get(chatID);
         Message message = new Message(
                 data.getString("content"), this.user.getUsername(),
                 data.getString("time_stamp"), chatID);
-        server.chats.get(chatID).receiveMessage(message);
+        Server.chats.get(chatID).receiveMessage(message);
         for (User user : chat.getUsers()) {
             if (user != this.user)
                 user.receiveMessage(message);
@@ -162,33 +162,33 @@ class ServerConnection implements Runnable, Closeable {
     }
 
     /**
-     * Signs up someone
+     * Signs up a user
      * @param data data
      * @return JSONObject
      */
     private JSONObject signUp(JSONObject data) {
         String username = data.getString("username");
         String password = data.getString("password");
-        if (server.users.containsKey(username)) {
+        if (Server.users.containsKey(username)) {
             return new JSONObject().put("result", "ERROR").put("message", "USER_ALREADY_EXISTS");
         }
         User user = new User(username, password);
-        server.users.put(username, user);
+        Server.users.put(username, user);
         return new JSONObject().put("result", "SUCCESS");
     }
 
     /**
-     * Login
+     * Logins a user
      * @param data data
-     * @return JSONOBject
+     * @return JSONObject
      */
     private JSONObject login(JSONObject data) {
         if (!isNotLoggedIn())
             return new JSONObject().put("result", "ERROR").put("message", "ALREADY_LOGGED_IN");
         String username = data.getString("username");
         User user;
-        if (server.users.containsKey(username)) {
-            user = server.users.get(username);
+        if (Server.users.containsKey(username)) {
+            user = Server.users.get(username);
         } else {
             return new JSONObject().put("result", "ERROR").put("message", "USER_DOES_NOT_EXIST");
         }
@@ -201,15 +201,15 @@ class ServerConnection implements Runnable, Closeable {
     }
 
     /**
-     * Get chats
-     * @return JSONOBject
+     * Returns user's accessible chats
+     * @return JSONObject
      */
     private JSONObject getChats() {
         if (isNotLoggedIn())
             return new JSONObject().put("result", "ERROR").put("message", "NOT_LOGGED_IN");
         ArrayList<Integer> userChats = new ArrayList<>();
-        for (int i = 0; i < server.chats.size(); i++) {
-            if (server.chats.get(i).containsUser(this.user)) {
+        for (int i = 0; i < Server.chats.size(); i++) {
+            if (Server.chats.get(i).containsUser(this.user)) {
                 userChats.add(i);
             }
         }
@@ -217,21 +217,21 @@ class ServerConnection implements Runnable, Closeable {
     }
 
     /**
-     * Get messages
+     * Returns all messages in a chat
      * @param chatID chat where the messages come from
-     * @return JSON Object
+     * @return JSONObject
      */
     private JSONObject getMessages(int chatID) {
         if (isNotLoggedIn())
             return new JSONObject().put("result", "ERROR").put("message", "NOT_LOGGED_IN");
         return new JSONObject().put("messages",
-                server.chats.get(chatID).getMessages().stream().map(
-                        (message) -> message.toJSON()).collect(Collectors.toList()))
+                        Server.chats.get(chatID).getMessages().stream().map(
+                                (message) -> message.toJSON()).collect(Collectors.toList()))
                 .put("result", "SUCCESS");
     }
 
     /**
-     * Get qued messages
+     * Returns user's queued messages
      * @return JSONObject
      */
     private JSONObject getQueuedMessages() {
@@ -242,17 +242,18 @@ class ServerConnection implements Runnable, Closeable {
     }
 
     /**
-     * check if not logged in
+     * Check if not logged in
      * @return true or false
      */
     private boolean isNotLoggedIn() {
         return this.user == null;
     }
 
-    @Override
+
     /**
-     * Closes
+     * Closes the server
      */
+    @Override
     public void close() throws IOException {
         this.thread.interrupt();
         this.user.disconnect();
