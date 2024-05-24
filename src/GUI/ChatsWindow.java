@@ -113,7 +113,9 @@ public class ChatsWindow extends JFrame implements Serializable {
                 System.out.println("alr a chat");
                 frame.setVisible(false);
                 frame.getDisplays()[index].setVisible(true);
-                //retrieve messages
+                client.addGetMessagesOnResponseCallback((a) -> {
+                    frame.getDisplays()[index].setChat(new Chat(index, a.getJSONArray("")));
+                });
             }
         }
     }

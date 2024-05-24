@@ -96,7 +96,7 @@ public class ChatDisplay extends JFrame {
             newMsg = frame.getNewMSG();
         }
         public void keyPressed(KeyEvent e) {
-            if (e.getKeyCode() == 10 && !newMsg.getText().equals("")) {
+            if (e.getKeyCode() == 10 && !newMsg.getText().equals("") && !newMsg.getText().contains("\n")) {
                 client.addSendMessageOnResponseCallback((a) -> {});
                 client.sendMessage(newMsg.getText(), "", chat.getChatID());
                 getExistingMsgs().setText(getExistingMsgs().getText() + frame.addMessage(
@@ -104,12 +104,21 @@ public class ChatDisplay extends JFrame {
                 ));
                 frame.getNewMSG().setText("");
             }
+            if (e.getKeyCode() == 27) {
+                quit(frame);
+            }
         }
         @Override
         public void keyTyped(KeyEvent e) {
+            if (e.getKeyCode() == 10 || frame.getNewMSG().getText().contains("\n")) {
+                frame.getNewMSG().setText("");
+            }
         }
         @Override
         public void keyReleased(KeyEvent e) {
+            if (e.getKeyCode() == 10 || frame.getNewMSG().getText().contains("\n")) {
+                frame.getNewMSG().setText("");
+            }
         }
     }
     private class Quit implements ActionListener {
@@ -118,10 +127,14 @@ public class ChatDisplay extends JFrame {
             this.frame = frame;
         }
         public void actionPerformed(ActionEvent e) {
-            System.out.println("quit out of chat");
-            frame.setVisible(false);
-            frame.getWindow().setVisible(true);
+            quit(frame);
         }
+    }
+    private void quit(ChatDisplay frame) {
+        System.out.println("quit out of chat");
+        frame.setVisible(false);
+        frame.getWindow().setVisible(true);
+        frame.getNewMSG().setText("");
     }
 
     private ChatsWindow getWindow() {
@@ -132,6 +145,9 @@ public class ChatDisplay extends JFrame {
     }
     private Chat getChat() {
         return chat;
+    }
+    public void setChat(Chat chat) {
+        this.chat = chat;
     }
     private TextArea getNewMSG() {
         return newMsg;

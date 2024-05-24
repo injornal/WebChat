@@ -1,7 +1,5 @@
 package GUI.Components;
 
-import java.util.ArrayList;
-
 public class Person {
     private String name;
     private int[] chatIDs;

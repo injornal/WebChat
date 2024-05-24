@@ -1,19 +1,24 @@
 package GUI.Components;
-import Server.Message;
 
 import java.util.*;
 
+import org.json.JSONArray;
 
 public class Chat {
-    
     private int chatID;
-    ArrayList<Person> users = new ArrayList<Person>();
-    ArrayList<Message> messages = new ArrayList<Message>();
+    private ArrayList<Message> messages = new ArrayList<Message>();
 
     public Chat(int chatID) {
         this.chatID = chatID;
     }
-
+    public Chat(int chatID, JSONArray messages) {
+        this.chatID = chatID;
+        ArrayList<Message> msgs = new ArrayList<Message>();
+        for (int i = 0; i < messages.length(); i++) {
+            msgs.add((Message) messages.getJSONObject(i));
+        }
+        this.messages = msgs;
+    }
     public int getChatID(){
         return chatID;
     }
@@ -21,24 +26,10 @@ public class Chat {
         chatID = id;
     }
 
-    public void joinChat(Person p){
-        users.add(p);
-    }
-
     public ArrayList<Message> getMessages(){
         return messages;
     }
-
     public void receiveMessage(Message m) {
         messages.add(m);
     }
-
-    public ArrayList<Person> getUsers(){
-        return users;
-    }
-    
-    public boolean exists(){
-        return users.size() != 0;
-    }
-
 }

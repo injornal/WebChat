@@ -92,15 +92,7 @@ public class LoginWindow extends JFrame {
             System.out.println("login result: " + loginResult);
             if (loginResult.equals("SUCCESS")) {
                 frame.setVisible(false);
-                //if (save stat exists) {
-                //  File f = save state;
-                //  FileInputStream fis = new FileInputStream(f);
-                //  ObjectInputStream ois = new ObjectInputStream(fis);
-                //  new ChatsWindow((ChatsWindow) ois.readObject());
-                //}
-                //else {
-                    new ChatsWindow(client, new Person(frame.getUserField().getText()));
-                //}
+                new ChatsWindow(client, new Person(frame.getUserField().getText()));
             }
             else {
                 JOptionPane loginPane = new JOptionPane("Login Fail");
@@ -118,12 +110,13 @@ public class LoginWindow extends JFrame {
             this.frame = frame;
         }
         public void actionPerformed(ActionEvent e) {
+            frame.setVisible(false);
             Person person = new Person(frame.getUserField().getText());
+
             client.addGetChatsOnResponseCallback((a) -> {
-                JSONArray obj = a.getJSONArray("chats");
-                int[] ids = new int[obj.length()];
-                person.setChatIDs(ids);
+                person.setChatID(a.getJSONArray("chats"));
             });
+            client.getChats();
             new ChatsWindow(client, person);
         }
     }
@@ -139,7 +132,6 @@ public class LoginWindow extends JFrame {
             for (char c : cList) {
                 p += c;
             }
-
             if (u.length() < 5 || u.length() > 12 || !isAlpha(u)) {
                 JOptionPane invalidUser = new JOptionPane("Invalid User");
                 invalidUser.showMessageDialog(null, "Invalid User");
@@ -157,10 +149,7 @@ public class LoginWindow extends JFrame {
                 {
                     String result = a.getString("result");
                     System.out.println("sign up result: " + result);
-                    if (result.equals("SUCCESS")) {
-                        login(frame);
-                    }
-                    else {
+                    if (!result.equals("SUCCESS")) {
                         JOptionPane signUpFail = new JOptionPane("User Already Exists");
                         signUpFail.showMessageDialog(null, "User Already Exists");
                         frame.getUserField().setText("");
@@ -168,10 +157,8 @@ public class LoginWindow extends JFrame {
                     }
                 });
                 client.signUp(u, p);
+                login(frame);
             }
         }
-    }
-    public static void main(String[] args) {
-        new LoginWindow(new Client());
     }
 }
