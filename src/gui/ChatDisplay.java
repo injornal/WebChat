@@ -143,8 +143,8 @@ public class ChatDisplay extends JFrame {
         }
         public void keyPressed(KeyEvent e) {
             if (e.getKeyCode() == 10 && !newMsg.getText().equals("") && !newMsg.getText().contains("\n")) {
-                //client.addSendMessageOnResponseCallback((a) -> {});
-                //client.sendMessage(newMsg.getText(), "", chat.getChatID());
+                client.addSendMessageOnResponseCallback((a) -> {});
+                client.sendMessage(newMsg.getText(), "", chat.getChatID());
                 getExistingMsgs().setText(getExistingMsgs().getText() + frame.addMessage(
                     new Message(newMsg.getText(), person.getName(), "", frame.getChat().getChatID())
                 ));
@@ -157,13 +157,13 @@ public class ChatDisplay extends JFrame {
         }
         @Override
         public void keyTyped(KeyEvent e) {
-            if (e.getKeyCode() == 10) {// || frame.getNewMSG().getText().contains("\n")) {
+            if (e.getKeyCode() == 10 || frame.getNewMSG().getText().contains("\n")) {
                 frame.getNewMSG().setText("");
             }
         }
         @Override
         public void keyReleased(KeyEvent e) {
-            if (e.getKeyCode() == 10) {// || frame.getNewMSG().getText().contains("\n")) {
+            if (e.getKeyCode() == 10 || frame.getNewMSG().getText().contains("\n")) {
                 frame.getNewMSG().setText("");
             }
         }
