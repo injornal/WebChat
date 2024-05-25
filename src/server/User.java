@@ -87,11 +87,11 @@ class User implements Comparable<User>{
         return messages;
     }
 
-    @Override
     /** 
      * @param user other user that the user being compared to
      * @return int
      */
+    @Override
     public int compareTo(User user) {
         return this.username.compareTo(user.getUsername());
     }

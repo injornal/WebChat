@@ -67,10 +67,10 @@ public class Server implements Closeable {
         }
     }
 
-    @Override
     /**
      * close
      */
+    @Override
     public void close() throws IOException {
         for (ServerConnection connection : connections) {
             connection.close();

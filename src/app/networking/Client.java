@@ -42,10 +42,10 @@ public class Client implements Closeable {
         }
     }
 
-    @Override
     /**
      * close
      */
+    @Override
     public void close() throws IOException {
         this.socket.close();
         this.responseManager.close();

@@ -44,10 +44,10 @@ class ResponseManager implements Runnable, java.io.Closeable {
         this.thread.start();
     }
 
-    @Override
     /**
      * run
      */
+    @Override
     public void run() {
         try {
             String data;
@@ -261,10 +261,10 @@ class ResponseManager implements Runnable, java.io.Closeable {
         this.callbacks.get(requestType).add(callback);
     }
 
-    @Override
     /**
      * close
      */
+    @Override
     public void close() throws IOException {
         this.thread.interrupt();
     }
