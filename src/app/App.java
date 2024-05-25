@@ -1,6 +1,7 @@
 package app;
 
 import app.networking.Client;
+import gui.LoginWindow;
 
 /**
  * App class to start the program

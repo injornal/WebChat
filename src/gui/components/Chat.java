@@ -2,6 +2,9 @@ package gui.components;
 
 import java.util.*;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 /**
  * A chat with its chatID list of users, and list of messages
  * 
@@ -15,7 +18,7 @@ public class Chat {
     /**
      * messages
      */
-    ArrayList<Message> messages = new ArrayList<>();
+    ArrayList<Message> messages = new ArrayList<Message>();
 
     /**
      * Make a new chat with chatID
@@ -25,11 +28,11 @@ public class Chat {
     public Chat(int chatID) {
         this.chatID = chatID;
     }
-    public Chat(int chatID, ArrayList<Message> messages) {
+    public Chat(int chatID, JSONArray messages) {
         this.chatID = chatID;
         ArrayList<Message> msgs = new ArrayList<Message>();
-        for (int i = 0; i < messages.size(); i++) {
-            msgs.add((Message) messages.getJSONObject(i));
+        for (int i = 0; i < messages.length(); i++) {
+            msgs.add(fromJSON(messages.getJSONObject(i)));
         }
         this.messages = msgs;
     }
@@ -56,5 +59,9 @@ public class Chat {
      */
     public void receiveMessage(Message m) {
         messages.add(m);
+    }
+
+    public Message fromJSON(JSONObject obj) {
+        return new Message(obj.getString("content"),obj.getString("sender"),obj.getString("time_stamp"),obj.getInt("chat_id"));
     }
 }

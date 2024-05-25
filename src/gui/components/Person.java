@@ -2,6 +2,8 @@ package gui.components;
 
 import java.util.ArrayList;
 
+import org.json.JSONArray;
+
 /**
  * Person with a name and what chats they are in
  * 
@@ -27,7 +29,7 @@ public class Person {
         // this.loggedIn = status;
         chatIDs = new int[7];
         for (int i = 0; i < chatIDs.length; i++) {
-            chatIDs[i] = 0;
+            chatIDs[i] = -1;
         }
     }
     /*
@@ -47,12 +49,18 @@ public class Person {
      * 
      * @param IDs ids
      */
-    public void setChatIDs(ArrayList<Integer> IDs) {
+    public void setChatID(int id, int index) {
+        chatIDs[index] = id;
+    }
+
+    public void setChatID(JSONArray ids) {
+        int[] newIDs = new int[7];
         for (int i = 0; i < 7; i++) {
-            if (i < IDs.size()) {
-                chatIDs[i] = IDs.get(i);
-            } else {
-                chatIDs[i] = 0;
+            if (i < ids.length()) {
+                newIDs[i] = ids.getInt(i);
+            }
+            else {
+                newIDs[i] = -1;
             }
         }
     }
@@ -82,7 +90,7 @@ public class Person {
      * @return chat index
      */
     public boolean exists(int index) {
-        return (chatIDs[index] == 0);
+        return (chatIDs[index] != -1);
     }
     /*
      * public Chat[] getChats() {

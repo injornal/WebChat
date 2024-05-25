@@ -13,8 +13,7 @@ import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-
-import server.Message;
+import gui.components.Message;
 import app.networking.Client;
 import gui.components.Chat;
 import gui.components.Person;
@@ -77,11 +76,12 @@ public class ChatDisplay extends JFrame {
      * @param person Person in the chat
      * @param window window
      */
-    public ChatDisplay(Client client, Chat chat, ChatsWindow window) {
+    public ChatDisplay(Client client, Chat chat, ChatsWindow window, Person person) {
         this.window = window;
         this.client = client;
         this.chat = chat;
         this.messages = chat.getMessages();
+        this.person = person;
         setLayout(new GridLayout(2, 1));
 
         panel = new JPanel();
@@ -143,12 +143,13 @@ public class ChatDisplay extends JFrame {
         }
         public void keyPressed(KeyEvent e) {
             if (e.getKeyCode() == 10 && !newMsg.getText().equals("") && !newMsg.getText().contains("\n")) {
-                client.addSendMessageOnResponseCallback((a) -> {});
-                client.sendMessage(newMsg.getText(), "", chat.getChatID());
+                //client.addSendMessageOnResponseCallback((a) -> {});
+                //client.sendMessage(newMsg.getText(), "", chat.getChatID());
                 getExistingMsgs().setText(getExistingMsgs().getText() + frame.addMessage(
                     new Message(newMsg.getText(), person.getName(), "", frame.getChat().getChatID())
                 ));
                 frame.getNewMSG().setText("");
+                System.out.println("sent");
             }
             if (e.getKeyCode() == 27) {
                 quit(frame);
@@ -156,13 +157,13 @@ public class ChatDisplay extends JFrame {
         }
         @Override
         public void keyTyped(KeyEvent e) {
-            if (e.getKeyCode() == 10 || frame.getNewMSG().getText().contains("\n")) {
+            if (e.getKeyCode() == 10) {// || frame.getNewMSG().getText().contains("\n")) {
                 frame.getNewMSG().setText("");
             }
         }
         @Override
         public void keyReleased(KeyEvent e) {
-            if (e.getKeyCode() == 10 || frame.getNewMSG().getText().contains("\n")) {
+            if (e.getKeyCode() == 10) {// || frame.getNewMSG().getText().contains("\n")) {
                 frame.getNewMSG().setText("");
             }
         }
@@ -215,11 +216,11 @@ public class ChatDisplay extends JFrame {
         String prevSender = "";
         if (i != 0) {
             prevMessage = messages.get(i - 1);
-            prevSender = prevMessage.toJSON().getString("sender");
+            prevSender = prevMessage.getSender();
         }
         Message currMessage = messages.get(i);
-        String content = currMessage.toJSON().getString("content");
-        String sender = currMessage.toJSON().getString("sender");
+        String content = currMessage.getContent();
+        String sender = currMessage.getSender();
 
         if (!person.getName().equals(sender)) {
             if (!prevSender.equals(sender)) {

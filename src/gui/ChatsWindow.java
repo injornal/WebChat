@@ -91,6 +91,9 @@ public class ChatsWindow extends JFrame implements Serializable {
         setTitle("WebChat");
         pack();
         setVisible(true);
+        for (int i : person.getChatIds()) {
+            System.out.print(i + " ");
+        }
     }
     
     public Client getClient() {
@@ -181,7 +184,7 @@ public class ChatsWindow extends JFrame implements Serializable {
                         frame.getJButtons()[index].addActionListener(new ClickChat(frame, index));
                     });
                     client.createChat();
-                    frame.getDisplays()[index] = new ChatDisplay(client, chat, frame);
+                    frame.getDisplays()[index] = new ChatDisplay(client, chat, frame, person);
                     frame.setVisible(false);
                     JPanel panel = frame.getPanel();
                     panel.remove(index);
@@ -204,7 +207,7 @@ public class ChatsWindow extends JFrame implements Serializable {
                             frame.getJButtons()[index] = new JButton("" + id);
                             frame.getJButtons()[index].addActionListener(new ClickChat(frame, index));
 
-                            frame.getDisplays()[index] = new ChatDisplay(client, chat, frame);
+                            frame.getDisplays()[index] = new ChatDisplay(client, chat, frame, person);
                             //retrieve messages
                             frame.setVisible(false);
                             JPanel panel = frame.getPanel();

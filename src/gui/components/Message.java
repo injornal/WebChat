@@ -10,7 +10,7 @@ import org.json.JSONObject;
  * @author Pranav
  * @version 1.0
  */
-class Message {
+public class Message {
     private final String content;
     private final String sender;
     private final String timeStamp;
@@ -30,13 +30,16 @@ class Message {
         this.timeStamp = timeStamp;
         this.chatId = chatId;
     }
-
-    /**
-     * Creates a JSON object with the same info
-     * 
-     * @return JSON Object with messages info
-     */
-    public Message fromJSON(JSONObject obj) {
-        return new Message(obj.getString("content"),obj.getString("sender"),obj.getString("time_stamp"),obj.getInt("chat_id"));
+    public String getContent() {
+        return content;
+    }
+    public String getSender() {
+        return content;
+    }
+    public String getTimeStamp() {
+        return content;
+    }
+    public int getChatID() {
+        return chatId;
     }
 }
