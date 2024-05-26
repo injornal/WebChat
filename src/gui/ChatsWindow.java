@@ -66,22 +66,25 @@ public class ChatsWindow extends JFrame implements Serializable {
     public ChatsWindow(Client client, Person person) {
         this.client = client;
         this.person = person;
-
+        System.out.println("ids at start of chatswindow constructor: " + person.out());
         panel = new JPanel();
         panel.setBorder(BorderFactory.createEmptyBorder(30, 30, 10, 30));
         panel.setLayout(new GridLayout(2, 4));
         setMinimumSize(new Dimension(600, 300));
         setMaximumSize(new Dimension(600, 300));
         JButtons = new JButton[7];
+        System.out.println("ids before buttons are created: " + person.out());
         for (int i = 0; i < 7; i++) {
             if (person.exists(i)) {
                 JButtons[i] = new JButton("" + person.getChatIds()[i]);
-            } else {
+            }
+            else {
                 JButtons[i] = new JButton("New Chat");
             }
             JButtons[i].addActionListener(new ClickChat(this, i));
             panel.add(JButtons[i]);
         }
+        System.out.println("ids after buttons are created: " + person.out());
 
         JButton logout = new JButton("Logout");
         logout.addActionListener(new Logout(this));
@@ -91,9 +94,6 @@ public class ChatsWindow extends JFrame implements Serializable {
         setTitle("WebChat");
         pack();
         setVisible(true);
-        for (int i : person.getChatIds()) {
-            System.out.print(i + " ");
-        }
     }
     
     public Client getClient() {

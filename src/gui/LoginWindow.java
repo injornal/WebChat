@@ -19,10 +19,6 @@ import javax.swing.JPasswordField;
 import gui.components.Person;
 import app.networking.Client;
 
-import app.networking.Client;
-import gui.components.Chat;
-import gui.components.Person;
-
 /**
  * Displays a login window that prompts the user to login or signup 
  * by entering their username or password
@@ -142,15 +138,39 @@ public class LoginWindow extends JFrame {
             this.frame = frame;
         }
         public void actionPerformed(ActionEvent e) {
-            frame.setVisible(false);
-            Person person = new Person(frame.getUserField().getText());
-
-            client.addGetChatsOnResponseCallback((a) -> {
-                person.setChatID(a.getJSONArray("chats"));
+            String u = user.getText();
+            String p = "";
+            char[] cList = pass.getPassword();
+            for (char c : cList) {
+                p += c;
+            }
+            client.addLoginOnResponseCallback((a) -> {
+                String loginResult = a.getString("result");
+                System.out.println("login result: " + loginResult);
+                if (loginResult.equals("SUCCESS")) {
+                    frame.setVisible(false);
+                    Person person = new Person(u);
+                    System.out.println("ids when person is created: " + person.out());
+                    client.addGetChatsOnResponseCallback((b) -> {
+                        for (int i = 0; i < b.getJSONArray("chats").length(); i++) {
+                            person.setChatID(b.getJSONArray("chats").getInt(i), i);
+                        }
+                        System.out.println("ids while person is being created: " + person.out());
+                    });
+                    client.getChats();
+                    System.out.println("ids after person is created: " + person.out());
+                    new ChatsWindow(client, person);
+                }
+                else {
+                    JOptionPane loginPane = new JOptionPane("Login Fail");
+                    loginPane.showMessageDialog(null, "Login Fail");
+                    loginPane.setBorder(BorderFactory.createEmptyBorder(30,30,10,30));
+                    frame.getUserField().setText("");
+                    frame.getPassField().setText("");
+                }
             });
-            client.getChats();
-            new ChatsWindow(client, person);
-        }
+            client.login(u, p);
+        }   
     }
     private class SignUpButton implements ActionListener {
         private LoginWindow frame;
@@ -187,9 +207,11 @@ public class LoginWindow extends JFrame {
                         frame.getUserField().setText("");
                         frame.getPassField().setText("");
                     }
+                    else {
+                        login(frame);
+                    }
                 });
                 client.signUp(u, p);
-                login(frame);
             }
         }
     }

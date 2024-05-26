@@ -54,6 +54,7 @@ public class Person {
     }
 
     public void setChatID(JSONArray ids) {
+        System.out.println();
         int[] newIDs = new int[7];
         for (int i = 0; i < 7; i++) {
             if (i < ids.length()) {
@@ -63,6 +64,7 @@ public class Person {
                 newIDs[i] = -1;
             }
         }
+        chatIDs = newIDs;
     }
 
     /**
@@ -91,6 +93,14 @@ public class Person {
      */
     public boolean exists(int index) {
         return (chatIDs[index] != -1);
+    }
+
+    public String out() {
+        String result = "";
+        for (int i : chatIDs) {
+            result += (i + " ");
+        }
+        return result;
     }
     /*
      * public Chat[] getChats() {
