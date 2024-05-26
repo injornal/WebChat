@@ -54,7 +54,6 @@ public class Person {
     }
 
     public void setChatID(JSONArray ids) {
-        System.out.println();
         int[] newIDs = new int[7];
         for (int i = 0; i < 7; i++) {
             if (i < ids.length()) {

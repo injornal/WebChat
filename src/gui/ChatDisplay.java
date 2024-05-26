@@ -13,6 +13,10 @@ import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import gui.components.Message;
 import app.networking.Client;
 import gui.components.Chat;
@@ -46,7 +50,7 @@ public class ChatDisplay extends JFrame {
     /**
      * 
      */
-    private ArrayList<Message> messages;
+    private ArrayList<Message> messages = new ArrayList<Message>();
     /**
      * 
      */
@@ -80,7 +84,6 @@ public class ChatDisplay extends JFrame {
         this.window = window;
         this.client = client;
         this.chat = chat;
-        this.messages = chat.getMessages();
         this.person = person;
         setLayout(new GridLayout(2, 1));
 
@@ -131,6 +134,16 @@ public class ChatDisplay extends JFrame {
         setTitle("Chat ID: " + chat.getChatID());
         pack();
         setVisible(true);
+
+        client.addGetMessagesOnResponseCallback((a) -> {
+            JSONArray msgs = a.getJSONArray("messages");
+            for (int i = 0; i < msgs.length(); i++) {
+                JSONObject msg = msgs.getJSONObject(i);
+                messages.add(chat.fromJSON(msg));
+                getExistingMsgs().setText(getExistingMsgs().getText() + addMessage(chat.fromJSON(msg)));
+            }
+        });
+        client.getMessages(chat.getChatID());
     }
 
     private class Send implements KeyListener {
@@ -145,9 +158,8 @@ public class ChatDisplay extends JFrame {
             if (e.getKeyCode() == 10 && !newMsg.getText().equals("") && !newMsg.getText().contains("\n")) {
                 client.addSendMessageOnResponseCallback((a) -> {});
                 client.sendMessage(newMsg.getText(), "", chat.getChatID());
-                getExistingMsgs().setText(getExistingMsgs().getText() + frame.addMessage(
-                    new Message(newMsg.getText(), person.getName(), "", frame.getChat().getChatID())
-                ));
+                Message m = new Message(newMsg.getText(), person.getName(), "", frame.getChat().getChatID());
+                getExistingMsgs().setText(getExistingMsgs().getText() + frame.addMessage(m));
                 frame.getNewMSG().setText("");
                 System.out.println("sent");
             }
@@ -228,16 +240,20 @@ public class ChatDisplay extends JFrame {
             }
             if (content.length() < 26) {
                 result += (content + "\n");
-            } else {
+            }
+            else {
                 result += splitMessage(content, "") + "\n";
             }
-        } else {
+        }
+        else {
             if (content.length() < 22) {
                 result += (halfwaySpace + content + "\n");
-            } else {
+            }
+            else {
                 result += splitMessage(content, halfwaySpace) + "\n";
             }
         }
+        System.out.println("<" + result + ">");
         return result;
     }
     private String parseMessages() {

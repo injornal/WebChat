@@ -34,12 +34,15 @@ public class Message {
         return content;
     }
     public String getSender() {
-        return content;
+        return sender;
     }
     public String getTimeStamp() {
-        return content;
+        return timeStamp;
     }
     public int getChatID() {
         return chatId;
+    }
+    public void out() {
+        System.out.println("content: " + content + "\nsender: " + sender + "\nchatID: " + chatId);
     }
 }

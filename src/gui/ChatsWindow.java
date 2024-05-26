@@ -66,14 +66,12 @@ public class ChatsWindow extends JFrame implements Serializable {
     public ChatsWindow(Client client, Person person) {
         this.client = client;
         this.person = person;
-        System.out.println("ids at start of chatswindow constructor: " + person.out());
         panel = new JPanel();
         panel.setBorder(BorderFactory.createEmptyBorder(30, 30, 10, 30));
         panel.setLayout(new GridLayout(2, 4));
         setMinimumSize(new Dimension(600, 300));
         setMaximumSize(new Dimension(600, 300));
         JButtons = new JButton[7];
-        System.out.println("ids before buttons are created: " + person.out());
         for (int i = 0; i < 7; i++) {
             if (person.exists(i)) {
                 JButtons[i] = new JButton("" + person.getChatIds()[i]);
@@ -84,14 +82,13 @@ public class ChatsWindow extends JFrame implements Serializable {
             JButtons[i].addActionListener(new ClickChat(this, i));
             panel.add(JButtons[i]);
         }
-        System.out.println("ids after buttons are created: " + person.out());
 
         JButton logout = new JButton("Logout");
         logout.addActionListener(new Logout(this));
         panel.add(logout);
 
         add(panel, BorderLayout.CENTER);
-        setTitle("WebChat");
+        setTitle("WebChat: " + person.getName());
         pack();
         setVisible(true);
     }
@@ -142,10 +139,10 @@ public class ChatsWindow extends JFrame implements Serializable {
             else {
                 System.out.println("alr a chat");
                 frame.setVisible(false);
-                frame.getDisplays()[index].setVisible(true);
                 client.addGetMessagesOnResponseCallback((a) -> {
-                    frame.getDisplays()[index].setChat(new Chat(index, a.getJSONArray("")));
+                    frame.getDisplays()[index] = new ChatDisplay(client, new Chat(index, a.getJSONArray("messages")), frame, person);
                 });
+                client.getMessages(frame.getPerson().getChatIds()[index]);
             }
         }
     }
@@ -263,19 +260,6 @@ public class ChatsWindow extends JFrame implements Serializable {
         public void actionPerformed(ActionEvent e) {
             frame.dispose();
             System.out.println("logged out");
-            try {
-                // pass and quit app saveState(frame);
-            }
-            catch (Exception exception) {
-                exception.printStackTrace();
-            }
-        }
-        private File saveState(ChatsWindow frame) throws Exception {
-            File f = new File(frame.getPerson().getName() + ".txt");
-            FileOutputStream fos = new FileOutputStream(f);
-            ObjectOutputStream oos = new ObjectOutputStream(fos);
-            oos.writeObject(frame);
-            return f;
         }
     }
 }

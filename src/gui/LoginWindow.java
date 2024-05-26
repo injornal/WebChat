@@ -155,11 +155,11 @@ public class LoginWindow extends JFrame {
                         for (int i = 0; i < b.getJSONArray("chats").length(); i++) {
                             person.setChatID(b.getJSONArray("chats").getInt(i), i);
                         }
+                        new ChatsWindow(client, person);
                         System.out.println("ids while person is being created: " + person.out());
                     });
                     client.getChats();
                     System.out.println("ids after person is created: " + person.out());
-                    new ChatsWindow(client, person);
                 }
                 else {
                     JOptionPane loginPane = new JOptionPane("Login Fail");
