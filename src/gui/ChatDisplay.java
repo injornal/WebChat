@@ -146,17 +146,10 @@ public class ChatDisplay extends JFrame {
             }
         });
         client.getMessages(chat.getChatID());
-    }
-    
-    private class ChatUpdate implements ChangeListener {   //not finished
-        private Client client;
-        public ChatUpdate(Client client) {
-            this.client = client;
-        }
-        public void stateChanged(ChangeEvent e) {
-            //client.
-        }
-        
+
+        client.setReceiveMessageCallback((a) -> {
+            getExistingMsgs().setText(getExistingMsgs().getText() + addMessage(chat.fromJSON(a)));
+        });
     }
 
     private class Send implements KeyListener {
