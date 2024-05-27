@@ -8,11 +8,14 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+
 import java.util.ArrayList;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -139,11 +142,21 @@ public class ChatDisplay extends JFrame {
             JSONArray msgs = a.getJSONArray("messages");
             for (int i = 0; i < msgs.length(); i++) {
                 JSONObject msg = msgs.getJSONObject(i);
-                messages.add(chat.fromJSON(msg));
                 getExistingMsgs().setText(getExistingMsgs().getText() + addMessage(chat.fromJSON(msg)));
             }
         });
         client.getMessages(chat.getChatID());
+    }
+    
+    private class ChatUpdate implements ChangeListener {   //not finished
+        private Client client;
+        public ChatUpdate(Client client) {
+            this.client = client;
+        }
+        public void stateChanged(ChangeEvent e) {
+            //client.
+        }
+        
     }
 
     private class Send implements KeyListener {
@@ -218,11 +231,8 @@ public class ChatDisplay extends JFrame {
     }
    
     public String addMessage(Message m) {
-        int i = messages.indexOf(m);
-        if (i == -1) {
-            messages.add(m);
-            i = messages.size() - 1;
-        }
+        messages.add(m);
+        int i = messages.size() - 1;
         String result = "";
         Message prevMessage = new Message("", "", "", -1);
         String prevSender = "";
