@@ -83,6 +83,8 @@ public class LoginWindow extends JFrame {
         setTitle("WebChat");
         pack();
         setVisible(true);
+
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
     }
     
     private boolean isAlpha(String s) {

@@ -138,6 +138,8 @@ public class ChatDisplay extends JFrame {
         pack();
         setVisible(true);
 
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
+
         client.addGetMessagesOnResponseCallback((a) -> {
             JSONArray msgs = a.getJSONArray("messages");
             for (int i = 0; i < msgs.length(); i++) {

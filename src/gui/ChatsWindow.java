@@ -93,6 +93,8 @@ public class ChatsWindow extends JFrame implements Serializable {
         setTitle("WebChat: " + person.getName());
         pack();
         setVisible(true);
+
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
     }
     
     public Client getClient() {
