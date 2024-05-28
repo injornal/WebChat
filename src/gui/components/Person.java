@@ -1,7 +1,5 @@
 package gui.components;
 
-import java.util.ArrayList;
-
 import org.json.JSONArray;
 
 /**
@@ -101,20 +99,4 @@ public class Person {
         }
         return result;
     }
-    /*
-     * public Chat[] getChats() {
-     * return chats;
-     * }
-     * public void setChats(Chat[] chats) {
-     * this.chats = chats;
-     * }
-     * public void addChat(int index, int chatID) {
-     * chatIDs[index] = chatID;
-     * chats[index] = new Chat(chatID);
-     * }
-     * public void joinChat(int index, int chatID, Chat chat) {
-     * chatIDs[index] = chatID;
-     * chats[index] = chat;
-     * }
-     */
 }

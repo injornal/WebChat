@@ -62,6 +62,8 @@ public class Chat {
     }
 
     public Message fromJSON(JSONObject obj) {
-        return new Message(obj.getString("content"),obj.getString("sender"),obj.getString("time_stamp"),obj.getInt("chat_id"));
+        return new Message(obj.getString("content"),
+        obj.getString("sender"),obj.getString("time_stamp"),
+        obj.getInt("chat_id"));
     }
 }

@@ -2,20 +2,21 @@ package gui;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.TextArea;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-
+import java.awt.font.FontRenderContext;
+import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
+
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -73,7 +74,11 @@ public class ChatDisplay extends JFrame {
     /**
      * 
      */
-    private final String halfwaySpace = "                                                                        ";
+    private AffineTransform affinetransform = new AffineTransform();     
+    private FontRenderContext frc = new FontRenderContext(affinetransform,true,true);     
+    private Font font;
+    private final String HALFWAY_SPACE = "                                                                        ";
+    private final double LINE_LENGTH;
 
     /**
      * Creates a new display with a chat
@@ -96,18 +101,24 @@ public class ChatDisplay extends JFrame {
         panel.setPreferredSize(new Dimension(500, 800));
         panel.setMinimumSize(new Dimension(500, 800));
         panel.setMaximumSize(new Dimension(500, 800));
+        panel.addKeyListener(new Tab(this));
+        panel.addKeyListener(new Quit(this));
 
-        TextArea existingMsg = new TextArea(parseMessages());
+        TextArea existingMsg = new TextArea();
         existingMsg.setEditable(false);
         // existingMsg.setPreferredSize(new Dimension(600, 800));
         // existingMsg.setMinimumSize(new Dimension(600, 800));
         // existingMsg.setMaximumSize(new Dimension(600, 800));
         panel.add(existingMsg);
         this.existingMsgs = existingMsg;
+        font = existingMsg.getFont();
+        LINE_LENGTH = width(21);
 
         interactivePanel = new JPanel();
         // interactivePanel.setBorder(BorderFactory.createEmptyBorder(10,30,30,30));
         interactivePanel.setLayout(new GridLayout(1, 2));
+        interactivePanel.addKeyListener(new Tab(this));
+        interactivePanel.addKeyListener(new Quit(this));
         // interactivePanel.setMinimumSize(new Dimension(600, 183));
         // interactivePanel.setMaximumSize(new Dimension(600, 183));
 
@@ -117,6 +128,8 @@ public class ChatDisplay extends JFrame {
         // newMsg.setMaximumSize(new Dimension(600, 183));
         interactivePanel.add(newMsg);
         newMsg.addKeyListener(new Send(this));
+        newMsg.addKeyListener(new Tab(this));
+        newMsg.addKeyListener(new Quit(this));
 
         JPanel buttons = new JPanel();
         interactivePanel.setBorder(BorderFactory.createEmptyBorder(10,30,30,30));
@@ -127,14 +140,29 @@ public class ChatDisplay extends JFrame {
         interactivePanel.add(buttons);
 
         JButton quit = new JButton("Quit");
-        quit.addActionListener(new Quit(this));
+        quit.addActionListener(new QuitButton(this));
         buttons.add(quit);
 
         setMinimumSize(new Dimension(600, 983));
         setMaximumSize(new Dimension(600, 983));
         add(panel, BorderLayout.NORTH);
         add(interactivePanel, BorderLayout.SOUTH);
-        setTitle("Chat ID: " + chat.getChatID());
+        addKeyListener(new Tab(this));
+        addKeyListener(new Quit(this));
+
+        System.out.println("ids: " + person.out()); //  < 0  1  2 >
+        String title = "";
+        for (int id : person.getChatIds()) {
+            if (id != -1) {
+                title += (" " + id + " ");
+            }
+        }
+        title = title.replace(" " + chat.getChatID() + " ", " (" + chat.getChatID() + ") ");
+        title = title.replaceAll("  ", " / ");
+        setTitle(title);
+        System.out.println("set title: " + title);
+
+
         pack();
         setVisible(true);
 
@@ -152,6 +180,99 @@ public class ChatDisplay extends JFrame {
         });
     }
 
+    private class Tab implements KeyListener {
+        private ChatDisplay frame;
+
+        public Tab(ChatDisplay frame) {
+            this.frame = frame;
+        }
+        public void keyPressed(KeyEvent e) {
+            if (e.getKeyCode() == 9) {
+                frame.getNewMSG().setText(frame.getNewMSG().getText().replace("\t", ""));
+            }
+            if (e.getKeyCode() == 9 && frame.getTitle().length() != 5) {
+                System.out.println("-----------------");
+                frame.setVisible(false);
+                String title = frame.getTitle();
+                int id = frame.getTitle().indexOf(" (" + frame.getChat().getChatID() + ") ");
+                System.out.println("index: " + id);
+                if (id + 7 > title.length()) {
+                    System.out.println("last in list");
+                    System.out.println("title: <" + title + ">");
+                    System.out.println("index: " + id);
+                    id = nextID(title,0);
+                }
+                else {
+                    System.out.println("not last in list");
+                    System.out.println("title: <" + title + ">");
+                    System.out.println("index: " + id);
+                    id = nextID(title, id+2);
+                }
+                System.out.println("next id: " + id);
+                for (ChatDisplay d : window.getDisplays()) {
+                    if (d != null && d.getChat().getChatID() == id) {
+                        System.out.println("happens");
+                        d.setVisible(true);
+                        String t = "";
+                        for (int chatID : person.getChatIds()) {
+                            if (chatID != -1) {
+                                t += (" " + chatID + " ");
+                            }
+                        }
+                        t = t.replace(" " + id + " ", " (" + id + ") ");
+                        t = t.replaceAll("  ", " / ");
+                        d.setTitle(t);
+                        System.out.println("new title: " + title);
+                    }
+                }
+                frame.getNewMSG().setText("");
+                System.out.println("-----------------");
+            }
+        }
+        @Override
+        public void keyTyped(KeyEvent e) {
+            if (e.getKeyCode() == 9) {
+                frame.getNewMSG().setText(frame.getNewMSG().getText().replace("\t", ""));
+            }
+        }
+        @Override
+        public void keyReleased(KeyEvent e) {
+            if (e.getKeyCode() == 9) {
+                frame.getNewMSG().setText(frame.getNewMSG().getText().replace("\t", ""));
+            }
+        }
+        private int nextID(String s, int i) {
+            i++;
+            while (!isNum(s.charAt(i))) {
+                i++;
+            }
+            int id = toNum(s.charAt(i));
+            System.out.println(id);
+            if (isNum(s.charAt(i+1))) {
+                id = id*10 + toNum(s.charAt(i+1));
+            }
+            return id;
+        }
+        private boolean isNum(char c) {
+            String nums = "0123456789";
+            for (int i = 0; i < nums.length(); i++) {
+                if (c == nums.charAt(i)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+        private int toNum(char c) {
+            String nums = "0123456789";
+            int[] values = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+            for (int i = 0; i < nums.length(); i++) {
+                if (c == nums.charAt(i)) {
+                    return values[i];
+                }
+            }
+            return -1;
+        }
+    }
     private class Send implements KeyListener {
         private ChatDisplay frame;
         private TextArea newMsg;
@@ -161,6 +282,7 @@ public class ChatDisplay extends JFrame {
             newMsg = frame.getNewMSG();
         }
         public void keyPressed(KeyEvent e) {
+            frame.getNewMSG().setText(frame.getNewMSG().getText().replace("\t", ""));
             if (e.getKeyCode() == 10 && !newMsg.getText().equals("") && !newMsg.getText().contains("\n")) {
                 client.addSendMessageOnResponseCallback((a) -> {});
                 client.sendMessage(newMsg.getText(), "", chat.getChatID());
@@ -168,9 +290,6 @@ public class ChatDisplay extends JFrame {
                 getExistingMsgs().setText(getExistingMsgs().getText() + frame.addMessage(m));
                 frame.getNewMSG().setText("");
                 System.out.println("sent");
-            }
-            if (e.getKeyCode() == 27) {
-                quit(frame);
             }
         }
         @Override
@@ -186,11 +305,28 @@ public class ChatDisplay extends JFrame {
             }
         }
     }
-
-    private class Quit implements ActionListener {
+    private class Quit implements KeyListener {
         private ChatDisplay frame;
 
         public Quit(ChatDisplay frame) {
+            this.frame = frame;
+        }
+        public void keyPressed(KeyEvent e) {
+            if (e.getKeyCode() == 27) {
+                quit(frame);
+            }
+        }
+        @Override
+        public void keyTyped(KeyEvent e) {
+        }
+        @Override
+        public void keyReleased(KeyEvent e) {
+        }
+    }
+    private class QuitButton implements ActionListener{
+        private ChatDisplay frame;
+
+        public QuitButton(ChatDisplay frame) {
             this.frame = frame;
         }
 
@@ -202,7 +338,6 @@ public class ChatDisplay extends JFrame {
         System.out.println("quit out of chat");
         frame.setVisible(false);
         frame.getWindow().setVisible(true);
-        frame.getNewMSG().setText("");
     }
 
     private ChatsWindow getWindow() {
@@ -237,11 +372,15 @@ public class ChatDisplay extends JFrame {
         String content = currMessage.getContent();
         String sender = currMessage.getSender();
 
+        System.out.println((int)(font.getStringBounds(content, frc).getWidth()));
         if (!person.getName().equals(sender)) {
             if (!prevSender.equals(sender)) {
-                result += (sender + "\n");
+                if (messages.indexOf(m) != 0) {
+                    result += "\n";
+                }
+                result += (sender + ":" + "\n");
             }
-            if (content.length() < 26) {
+            if (font.getStringBounds(content, frc).getWidth() <= LINE_LENGTH) {
                 result += (content + "\n");
             }
             else {
@@ -249,53 +388,81 @@ public class ChatDisplay extends JFrame {
             }
         }
         else {
-            if (content.length() < 22) {
-                result += (halfwaySpace + content + "\n");
+            if (!prevSender.equals(sender)) {
+                if (messages.indexOf(m) != 0) {
+                    result += "\n";
+                }
+            }
+            if (font.getStringBounds(content, frc).getWidth() <= LINE_LENGTH) {
+                result += (HALFWAY_SPACE + content + "\n");
             }
             else {
-                result += splitMessage(content, halfwaySpace) + "\n";
+                result += splitMessage(content, HALFWAY_SPACE) + "\n";
             }
         }
         System.out.println("<" + result + ">");
         return result;
     }
-    private String parseMessages() {
-        String result = "";
-        for (int i = 0; i < messages.size(); i++) {
-            result += addMessage(messages.get(i));
-        }
-        return result;
-    }
     private String splitMessage(String s, String spaceBefore) {
         String[] words = s.split(" ");    //empty string for space
         String result = spaceBefore;
-        int lineLength = 0;
+        double lineLength = 0;
         for (String word : words) {
-            if (word.length() < 21) {
-                if (lineLength + word.length() < 21) {
-                    lineLength += word.length() + 1;
+            if (width(word) <= LINE_LENGTH) {
+                if (lineLength + width(word + " ") < LINE_LENGTH) {
+                    lineLength += width(word + " ");
                     result += (word + " ");
                 }
+                else if (lineLength + width(word) < LINE_LENGTH) {
+                    lineLength += width(word);
+                    result += (word);
+                }
                 else {
-                    lineLength = word.length() + 1;
+                    lineLength = width(word + " ");
                     result += ("\n" + spaceBefore + word + " ");
                 }
             }
             else {
-                while (word.length() > 20) {
-                    String subWord = word.substring(0, 21);
-                    word = word.substring(21);
+                while (width(word) > LINE_LENGTH) {
+                    String subWord = sub(word, LINE_LENGTH);
+                    word = word.substring(subWord.length());
                     if (lineLength > 0) {
                         result += "\n" + spaceBefore + subWord;
                     }
                     else {
                         result += subWord;
-                        lineLength += 22;
+                        lineLength += width(subWord);
                     }
                 }
                 result += "\n" + spaceBefore + word;
             }
         }
+        System.out.println("-----------------------");
         return result;
+    }
+   
+    private String sub(String word, double LINE_LENGTH) {
+        String result = "";
+        double width = 0;
+        for (int i = 0; i < word.length(); i++) {
+            char c = word.charAt(i);
+            double w = font.getStringBounds(c+"", frc).getWidth();
+            width += w;
+            if (width > LINE_LENGTH) {
+                return result;
+            }
+            result += c;
+        }
+        return result;
+    }
+    private double width(int length) {
+        String s = "";
+        for (int i = 0; i < length; i++) {
+            s += "W";
+        }
+        return font.getStringBounds(s, frc).getWidth();
+    }
+    private double width(String word) {
+        return font.getStringBounds(word, frc).getWidth();
     }
 }
