@@ -7,24 +7,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.io.DataOutput;
-import java.io.DataOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-
-import org.json.JSONArray;
-
-import javax.swing.JPasswordField;
 
 import app.networking.Client;
 import gui.components.Chat;
@@ -40,7 +29,7 @@ import static java.lang.System.exit;
  * @author Pranav
  * @version 1.0
  */
-public class ChatsWindow extends JFrame implements Serializable {
+public class ChatsWindow extends JFrame {
     /**
      * 
      */
@@ -183,18 +172,19 @@ public class ChatsWindow extends JFrame implements Serializable {
                         chat.setChatID(id);
                         frame.getJButtons()[index] = new JButton("" + id);
                         frame.getJButtons()[index].addActionListener(new ClickChat(frame, index));
+
+                        frame.getDisplays()[index] = new ChatDisplay(client, chat, frame, person);
+                        frame.setVisible(false);
+                        JPanel panel = frame.getPanel();
+                        panel.remove(index);
+                        panel.add(frame.getJButtons()[index], index);
+                        System.out.print("ids: ");
+                        for (int chatID : person.getChatIds()) {
+                            System.out.print(chatID + " ");
+                        }
+                        System.out.println();
                     });
                     client.createChat();
-                    frame.getDisplays()[index] = new ChatDisplay(client, chat, frame, person);
-                    frame.setVisible(false);
-                    JPanel panel = frame.getPanel();
-                    panel.remove(index);
-                    panel.add(frame.getJButtons()[index], index);
-                    System.out.print("ids: ");
-                    for (int id : person.getChatIds()) {
-                        System.out.print(id + " ");
-                    }
-                    System.out.println();
                 }
                 else if (isNum(input.getText())) {
                     System.out.println("join chat");

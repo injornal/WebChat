@@ -13,8 +13,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-import org.json.JSONArray;
-
 import javax.swing.JPasswordField;
 import gui.components.Person;
 import app.networking.Client;
@@ -87,16 +85,16 @@ public class LoginWindow extends JFrame {
         setDefaultCloseOperation(EXIT_ON_CLOSE);
     }
     
-    private boolean isAlpha(String s) {
-        String alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    private boolean isValid(String s) {
+        String characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789._";
         for (int c = 0; c < s.length(); c++) {
-            boolean alpha = false;
-            for (int a = 0; a < alphabet.length(); a++) {
-                if (s.charAt(c) == alphabet.charAt(a)) {
-                    alpha = true;
+            boolean valid = false;
+            for (int a = 0; a < characters.length(); a++) {
+                if (s.charAt(c) == characters.charAt(a)) {
+                    valid = true;
                 }
             }
-            if (!alpha) {
+            if (!valid) {
                 return false;
             }
         }
@@ -188,7 +186,7 @@ public class LoginWindow extends JFrame {
             for (char c : cList) {
                 p += c;
             }
-            if (u.length() < 5 || u.length() > 12 || !isAlpha(u)) {
+            if (u.length() < 5 || u.length() > 12 || !isValid(u)) {
                 JOptionPane invalidUser = new JOptionPane("Invalid User");
                 invalidUser.showMessageDialog(null, "Invalid User");
                 frame.getUserField().setText("");
