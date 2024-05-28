@@ -30,6 +30,8 @@ import app.networking.Client;
 import gui.components.Chat;
 import gui.components.Person;
 
+import static java.lang.System.exit;
+
 /**
  * Displays the different clickable chats
  * 
@@ -84,7 +86,7 @@ public class ChatsWindow extends JFrame implements Serializable {
         }
 
         JButton logout = new JButton("Logout");
-        logout.addActionListener(new Logout(this));
+        logout.addActionListener(new Logout(this, this.client));
         panel.add(logout);
 
         add(panel, BorderLayout.CENTER);
@@ -252,14 +254,17 @@ public class ChatsWindow extends JFrame implements Serializable {
     }
     private class Logout implements ActionListener {
         private ChatsWindow frame;
+        private Client client;
 
-        public Logout(ChatsWindow frame) {
+        public Logout(ChatsWindow frame, Client client) {
             this.frame = frame;
+            this.client = client;
         }
 
         public void actionPerformed(ActionEvent e) {
             frame.dispose();
             System.out.println("logged out");
+            new LoginWindow(this.client);
         }
     }
 }

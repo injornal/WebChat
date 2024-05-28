@@ -119,7 +119,8 @@ public class LoginWindow extends JFrame {
             String loginResult = a.getString("result");
             System.out.println("login result: " + loginResult);
             if (loginResult.equals("SUCCESS")) {
-                frame.setVisible(false);
+//                frame.setVisible(false);
+                frame.dispose();
                 new ChatsWindow(client, new Person(frame.getUserField().getText()));
             }
             else {
@@ -148,7 +149,8 @@ public class LoginWindow extends JFrame {
                 String loginResult = a.getString("result");
                 System.out.println("login result: " + loginResult);
                 if (loginResult.equals("SUCCESS")) {
-                    frame.setVisible(false);
+//                    frame.setVisible(false);
+                    frame.dispose();
                     Person person = new Person(u);
                     System.out.println("ids when person is created: " + person.out());
                     client.addGetChatsOnResponseCallback((b) -> {
