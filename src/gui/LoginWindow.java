@@ -40,7 +40,6 @@ public class LoginWindow extends JFrame {
      */
     public LoginWindow(Client client) {
         this.client = client;
-        client.start("127.0.0.1", 8080);
 
         user = new JTextField();
         pass = new JPasswordField();
