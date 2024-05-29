@@ -4,8 +4,8 @@ import java.util.*;
 
 
 class Chat {
-    private final Set<User> users = new HashSet<>();
-    private final List<Message> messages = new ArrayList<>();
+    private final Set<User> users = Collections.synchronizedSet(new HashSet<>());
+    private final List<Message> messages = Collections.synchronizedList(new ArrayList<>());
 
     
     protected Set<User> getUsers() {
