@@ -66,6 +66,13 @@ public class Client implements Closeable {
         this.writer.println(request);
     }
 
+    /**
+     * Registers a new user and automatically sets callback
+     * 
+     * @param username user's username
+     * @param password user's password
+     * @param callback function to be called after the server's response
+     */
     public void signUp(String username, String password, Consumer<JSONObject> callback) {
         this.responseManager.addCallback(RequestType.SIGN_UP, callback);
         this.signUp(username, password);
@@ -112,6 +119,12 @@ public class Client implements Closeable {
         this.writer.println(request);
     }
 
+    /**
+     * Logs in a new user and automatically sets callback
+     * @param username user's username
+     * @param password user's password
+     * @param callback function to be called after the server's response
+     */
     public void login(String username, String password, Consumer<JSONObject> callback) {
         this.responseManager.addCallback(RequestType.LOGIN ,callback);
         this.login(username, password);
@@ -153,6 +166,10 @@ public class Client implements Closeable {
         this.writer.println(request);
     }
 
+    /**
+     * Creates a new chat and automatically sets callback
+     * @param callback function to be called after the server's response
+     */
     public void createChat(Consumer<JSONObject> callback) {
         this.responseManager.addCallback(RequestType.CREATE_CHAT ,callback);
         this.createChat();
@@ -196,6 +213,12 @@ public class Client implements Closeable {
         this.writer.println(request);
     }
 
+    
+    /**
+     * Adds a user to and automatically sets callback
+     * @param chatID id of the chat that the user joins
+     * @param callback function to be called after the server's response
+     */
     public void joinChat(int chatID, Consumer<JSONObject> callback) {
         this.responseManager.addCallback(RequestType.JOIN_CHAT, callback);
         this.joinChat(chatID);

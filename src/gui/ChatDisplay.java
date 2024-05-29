@@ -291,6 +291,11 @@ public class ChatDisplay extends JFrame {
     private Chat getChat() {
         return chat;
     }
+    
+    /**
+     * Sets chat
+     * @param chat chat being set
+     */
     public void setChat(Chat chat) {
         this.chat = chat;
     }
@@ -298,6 +303,11 @@ public class ChatDisplay extends JFrame {
         return newMsg;
     }
    
+    /**
+     * Adds a message to a chat and displays it formatted correctly
+     * @param m message
+     * @return properly formatted message
+     */
     public String addMessage(Message m) {
         messages.add(m);
         int i = messages.size() - 1;
