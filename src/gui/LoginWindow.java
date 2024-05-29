@@ -27,25 +27,11 @@ import app.networking.Client;
  * @version 1.0
  */
 public class LoginWindow extends JFrame {
-    /**
-     * 
-     */
+    
     private JPanel panel;
-    /**
-     * 
-     */
     private JTextField user;
-    /**
-     * 
-     */
     private JPasswordField pass;
-    /**
-     * 
-     */
     private JButton loginButton;
-    /**
-     * 
-     */
     private app.networking.Client client;
 
     /**

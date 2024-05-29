@@ -14,10 +14,8 @@ import org.json.JSONObject;
  * @version 1.0
  */
 public class Chat {
+    
     private int chatID;
-    /**
-     * messages
-     */
     ArrayList<Message> messages = new ArrayList<Message>();
 
     /**
@@ -28,6 +26,12 @@ public class Chat {
     public Chat(int chatID) {
         this.chatID = chatID;
     }
+    
+    /**
+     * Creates a chat with its id and an array of messages
+     * @param chatID chatID
+     * @param messages Array of messages
+     */
     public Chat(int chatID, JSONArray messages) {
         this.chatID = chatID;
         ArrayList<Message> msgs = new ArrayList<Message>();
@@ -36,9 +40,19 @@ public class Chat {
         }
         this.messages = msgs;
     }
+    
+    /**
+     * Returns a chat's id
+     * @return chatID
+     */
     public int getChatID(){
         return chatID;
     }
+    
+    /**
+     * Sets a chat's id
+     * @param id new id to be set
+     */
     public void setChatID(int id) {
         chatID = id;
     }
@@ -53,7 +67,7 @@ public class Chat {
     }
 
     /**
-     * Add messages to the chat
+     * Receives a message
      * 
      * @param m message to be added
      */
@@ -61,6 +75,11 @@ public class Chat {
         messages.add(m);
     }
 
+    /**
+     * Converts a JSONObject to a message object
+     * @param obj JSONObjects
+     * @return Message object with the JSONObjects info
+     */
     public Message fromJSON(JSONObject obj) {
         return new Message(obj.getString("content"),
         obj.getString("sender"),obj.getString("time_stamp"),

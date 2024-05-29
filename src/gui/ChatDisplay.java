@@ -35,45 +35,16 @@ import gui.components.Person;
  * @version 1.0
  */
 public class ChatDisplay extends JFrame {
-    /**
-     * 
-     */
+    
     private JPanel panel;
-    /**
-     * 
-     */
     private JPanel interactivePanel;
-    /**
-     * 
-     */
     private app.networking.Client client;
-    /**
-     * 
-     */
     private Chat chat;
-    /**
-     * 
-     */
     private ArrayList<Message> messages = new ArrayList<Message>();
-    /**
-     * 
-     */
     private Person person;
-    /**
-     * 
-     */
     private TextArea existingMsgs;
-    /**
-     * 
-     */
     private TextArea newMsg;
-    /**
-     * 
-     */
     private ChatsWindow window;
-    /**
-     * 
-     */
     private AffineTransform affinetransform = new AffineTransform();     
     private FontRenderContext frc = new FontRenderContext(affinetransform,true,true);     
     private Font font;

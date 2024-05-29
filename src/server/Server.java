@@ -15,31 +15,22 @@ import java.util.*;
 public class Server implements Closeable {
     private boolean running;
     private int port;
-    /**
-     * new treemap
-     */
     protected static final Map<String, User> users = Collections.synchronizedMap(new TreeMap<>() {
         {
             put("TestUser", new User("TestUser", "TestPassword"));
         }
     });
-    /**
-     * new arraylist
-     */
     protected static final List<Chat> chats = Collections.synchronizedList(new ArrayList<>());
-    // TODO fix chat removal issue
     private final ArrayList<ServerConnection> connections = new ArrayList<>();
 
-    /**
-     * introduce
-     */
+    
     private void introduce() {
         System.out.println("\u001B[31m" + "Server.WebChat server");
         System.out.println("Running on " + this.port + "\u001B[0m");
     }
 
     /**
-     * start server with port
+     * starts server with a port
      * @param port port
      */
     public void start(int port) {
@@ -55,10 +46,7 @@ public class Server implements Closeable {
         }
     }
 
-    /**
-     * main method
-     * @param args args
-     */
+    
     public static void main(String[] args) {
         try (Server server = new Server()) {
             server.start(8080);
@@ -68,7 +56,7 @@ public class Server implements Closeable {
     }
 
     /**
-     * close
+     * Closes the servers connections
      */
     @Override
     public void close() throws IOException {

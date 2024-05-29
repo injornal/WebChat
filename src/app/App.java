@@ -4,7 +4,7 @@ import app.networking.Client;
 import gui.LoginWindow;
 
 /**
- * App class to start the program
+ * Class to start the program
  * 
  * @author Chaitanya
  * @author Kostiantyn
@@ -16,7 +16,6 @@ public class App {
 
     /**
      * Starts the client
-     * 
      * @param client client
      */
     public App(Client client) {
@@ -25,10 +24,7 @@ public class App {
         new LoginWindow(client);
     }
 
-    /**
-     * main 
-     * @param args args
-     */
+    
     public static void main(String[] args) {
         new App(new Client());
     }

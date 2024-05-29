@@ -184,8 +184,8 @@ public class Client implements Closeable {
     }
 
     /**
-     * Joins the user to a chat
-     * @param chatID id of the chat
+     * Adds a user to a chat
+     * @param chatID id of the chat that the user will be joining
      */
     public void joinChat(int chatID) {
         this.responseManager.requestCounter.put("JOIN_CHAT", this.responseManager.requestCounter.get("JOIN_CHAT") + 1);
@@ -228,9 +228,9 @@ public class Client implements Closeable {
 
     /**
      * Sends a message into the given chat
-     * @param content the content of the message
-     * @param timeStamp the time the message was sent
-     * @param chatID the id of the chat
+     * @param content content of the message
+     * @param timeStamp time that the message was sent
+     * @param chatID id of the chat that the message will be sent in
      */
     public void sendMessage(String content, String timeStamp, int chatID) {
         this.responseManager.requestCounter.put("SEND", this.responseManager.requestCounter.get("SEND") + 1);
@@ -243,6 +243,13 @@ public class Client implements Closeable {
         this.writer.println(request);
     }
 
+    /**
+     * Sends a message to given chat and automatically sets the callback
+     * @param content content of the message
+     * @param timeStamp time that the message was sent
+     * @param chatID id of the chat that the mesage will be sent in
+     * @param callback function to be called after the server's response
+     */
     public void sendMessage(String content, String timeStamp, int chatID, Consumer<JSONObject> callback) {
         this.responseManager.addCallback(RequestType.SEND_MESSAGE, callback);
         this.sendMessage(content, timeStamp, chatID);
@@ -282,6 +289,10 @@ public class Client implements Closeable {
         this.writer.println(new JSONObject().put("action", "GET_CHATS"));
     }
 
+    /**
+     * Requests all the chats that the user is in and automatically sets callback
+     * @param callback function to be called after the servers response
+     */
     public void getChats(Consumer<JSONObject> callback) {
         this.responseManager.addCallback(RequestType.GET_CHATS, callback);
         this.getChats();
@@ -321,6 +332,11 @@ public class Client implements Closeable {
         this.writer.println(new JSONObject().put("action", "GET_MESSAGES").put("chat_id", chatID));
     }
 
+    /**
+     * Requests all the messages in a given chat and automatically sets the callback
+     * @param chatID id of the chat where messages are being retrieved
+     * @param callback function to be called after the servers response
+     */
     public void getMessages(int chatID, Consumer<JSONObject> callback) {
         this.responseManager.addCallback(RequestType.GET_MESSAGES, callback);
         this.getMessages(chatID);
@@ -390,26 +406,32 @@ public class Client implements Closeable {
     }
 
     /**
-     * add get queued messages
-     * @param callback callback
+     * Get queued messages and automatically sets callback
+     * @param callback function to be called after the servers response
      */
     public void getQueuedMessages(Consumer<JSONObject> callback) {
         this.responseManager.addCallback(RequestType.GET_QUEUED_MESSAGES, callback);
         this.getQueuedMessages();
     }
 
+   /**
+    * Adds a server response callback on GET_QUEUED_MESSAGES API method
+    * @param callback function to be called after the servers response
+    */
     public void addGetQueuedMessagesOnResponseCallback(Consumer<JSONObject> callback) {
         this.responseManager.addGetQueuedMessagesCallback(callback);
     }
 
+    /**
+     * Adds any server response callback
+     * @param requestType specifying type with enum object
+     * @param callback function to be called after the servers response
+     */
     public void addCallback(RequestType requestType, Consumer<JSONObject> callback) {
         this.responseManager.addCallback(requestType, callback);
     }
 
-    /**
-     * main
-     * @param args args
-     */
+    
     public static void main(String[] args) {
         try(Client client = new Client()) {
             client.start("127.0.0.1", 8080);

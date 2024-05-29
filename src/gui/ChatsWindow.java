@@ -30,21 +30,10 @@ import static java.lang.System.exit;
  * @version 1.0
  */
 public class ChatsWindow extends JFrame {
-    /**
-     * 
-     */
+    
     private JPanel panel;
-    /**
-     * 
-     */
     private app.networking.Client client;
-    /**
-     * 
-     */
     private JButton[] JButtons;
-    /**
-     * 
-     */
     private ChatDisplay[] displays = new ChatDisplay[7];
     private Person person;
 
@@ -86,18 +75,38 @@ public class ChatsWindow extends JFrame {
         setDefaultCloseOperation(EXIT_ON_CLOSE);
     }
     
+    /**
+     * Get client
+     * @return client
+     */
     public Client getClient() {
         return client;
     }
+    /**
+     * Get panel
+     * @return panel
+     */
     public JPanel getPanel() {
         return panel;
     }
+    /**
+     * Get person
+     * @return person
+     */
     public Person getPerson() {
         return person;
     }
+    /**
+     * Get Jbuttons
+     * @return Array of Jbuttons
+     */
     public JButton[] getJButtons() {
         return JButtons;
     }
+    /**
+     * Get displays
+     * @return Array of displays
+     */
     public ChatDisplay[] getDisplays() {
         return displays;
     }

@@ -46,6 +46,7 @@ public class Person {
      * Sets the Person's chatIDs
      * 
      * @param IDs ids
+     * @param index index that the id will be set at
      */
     public void setChatID(int id, int index) {
         chatIDs[index] = id;
@@ -92,11 +93,12 @@ public class Person {
         return (chatIDs[index] != -1);
     }
 
+    
     public String out() {
         String result = "";
         for (int i : chatIDs) {
             result += (i + " ");
-        }
+        } 
         return result;
     }
 }

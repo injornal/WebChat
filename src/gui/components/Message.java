@@ -22,7 +22,7 @@ public class Message {
      * @param content   content of the message
      * @param sender    sender of the message
      * @param timeStamp time at which the message was sent
-     * @param chatId    which chat the message will be sent to
+     * @param chatId    chat the message will be sent to
      */
     public Message(String content, String sender, String timeStamp, int chatId) {
         this.content = content;
@@ -30,18 +30,40 @@ public class Message {
         this.timeStamp = timeStamp;
         this.chatId = chatId;
     }
+    
+    /**
+     * Returns a messages content
+     * @return content
+     */
     public String getContent() {
         return content;
     }
+    
+    /**
+     * Returns a messages sender
+     * @return sender
+     */
     public String getSender() {
         return sender;
     }
+    
+    /**
+     * Returns a messages timestamp
+     * @return timestamp
+     */
     public String getTimeStamp() {
         return timeStamp;
     }
+    
+    /**
+     * Returns the chat's id that the message was sent to
+     * @return chatid
+     */
     public int getChatID() {
         return chatId;
     }
+    
+    
     public void out() {
         System.out.println("content: " + content + "\nsender: " + sender + "\nchatID: " + chatId);
     }
