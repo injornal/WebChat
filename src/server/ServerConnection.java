@@ -112,8 +112,7 @@ class ServerConnection implements Runnable, Closeable {
             return new JSONObject().put("result", "ERROR").put("message", "CHAT_DOES_NOT_EXIST");
         Chat chat = Server.chats.get(chatID);
         Message message = new Message(
-                data.getString("content"), this.user.getUsername(),
-                data.getString("time_stamp"), chatID);
+                data.getString("content"), this.user.getUsername(), chatID);
         Server.chats.get(chatID).receiveMessage(message);
         for (User user : chat.getUsers()) {
             if (user != this.user)

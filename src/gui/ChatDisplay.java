@@ -12,6 +12,7 @@ import java.awt.event.KeyListener;
 import java.awt.font.FontRenderContext;
 import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
+import java.util.PriorityQueue;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -72,31 +73,18 @@ public class ChatDisplay extends JFrame {
         panel.setPreferredSize(new Dimension(500, 800));
         panel.setMinimumSize(new Dimension(500, 800));
         panel.setMaximumSize(new Dimension(500, 800));
-        panel.addKeyListener(new Tab(this));
-        panel.addKeyListener(new Quit(this));
 
         TextArea existingMsg = new TextArea();
         existingMsg.setEditable(false);
-        // existingMsg.setPreferredSize(new Dimension(600, 800));
-        // existingMsg.setMinimumSize(new Dimension(600, 800));
-        // existingMsg.setMaximumSize(new Dimension(600, 800));
         panel.add(existingMsg);
         this.existingMsgs = existingMsg;
         font = existingMsg.getFont();
-        LINE_LENGTH = width(21);
+        LINE_LENGTH = width(21)-1;
 
         interactivePanel = new JPanel();
-        // interactivePanel.setBorder(BorderFactory.createEmptyBorder(10,30,30,30));
         interactivePanel.setLayout(new GridLayout(1, 2));
-        interactivePanel.addKeyListener(new Tab(this));
-        interactivePanel.addKeyListener(new Quit(this));
-        // interactivePanel.setMinimumSize(new Dimension(600, 183));
-        // interactivePanel.setMaximumSize(new Dimension(600, 183));
 
         newMsg = new TextArea();
-        // newMsg.setPreferredSize(new Dimension(600, 600));
-        // newMsg.setMinimumSize(new Dimension(600, 183));
-        // newMsg.setMaximumSize(new Dimension(600, 183));
         interactivePanel.add(newMsg);
         newMsg.addKeyListener(new Send(this));
         newMsg.addKeyListener(new Tab(this));
@@ -105,9 +93,6 @@ public class ChatDisplay extends JFrame {
         JPanel buttons = new JPanel();
         interactivePanel.setBorder(BorderFactory.createEmptyBorder(10,30,30,30));
         interactivePanel.setLayout(new GridLayout(2,1));
-        //interactivePanel.setMinimumSize(new Dimension(600, 183))
-        //interactivePanel.setMinimumSize(new Dimension(600, 183));
-        //interactivePanel.setMaximumSize(new Dimension(600, 183));
         interactivePanel.add(buttons);
 
         JButton quit = new JButton("Quit");
@@ -118,10 +103,7 @@ public class ChatDisplay extends JFrame {
         setMaximumSize(new Dimension(600, 983));
         add(panel, BorderLayout.NORTH);
         add(interactivePanel, BorderLayout.SOUTH);
-        addKeyListener(new Tab(this));
-        addKeyListener(new Quit(this));
 
-        System.out.println("ids: " + person.out()); //  < 0  1  2 >
         String title = "";
         for (int id : person.getChatIds()) {
             if (id != -1) {
@@ -131,12 +113,9 @@ public class ChatDisplay extends JFrame {
         title = title.replace(" " + chat.getChatID() + " ", " (" + chat.getChatID() + ") ");
         title = title.replaceAll("  ", " / ");
         setTitle(title);
-        System.out.println("set title: " + title);
-
 
         pack();
         setVisible(true);
-
         setDefaultCloseOperation(EXIT_ON_CLOSE);
 
         client.addGetMessagesOnResponseCallback((a) -> {
@@ -164,27 +143,17 @@ public class ChatDisplay extends JFrame {
                 frame.getNewMSG().setText(frame.getNewMSG().getText().replace("\t", ""));
             }
             if (e.getKeyCode() == 9 && frame.getTitle().length() != 5) {
-                System.out.println("-----------------");
                 frame.setVisible(false);
                 String title = frame.getTitle();
                 int id = frame.getTitle().indexOf(" (" + frame.getChat().getChatID() + ") ");
-                System.out.println("index: " + id);
                 if (id + 7 > title.length()) {
-                    System.out.println("last in list");
-                    System.out.println("title: <" + title + ">");
-                    System.out.println("index: " + id);
                     id = nextID(title,0);
                 }
                 else {
-                    System.out.println("not last in list");
-                    System.out.println("title: <" + title + ">");
-                    System.out.println("index: " + id);
                     id = nextID(title, id+2);
                 }
-                System.out.println("next id: " + id);
                 for (ChatDisplay d : window.getDisplays()) {
                     if (d != null && d.getChat().getChatID() == id) {
-                        System.out.println("happens");
                         d.setVisible(true);
                         String t = "";
                         for (int chatID : person.getChatIds()) {
@@ -195,11 +164,9 @@ public class ChatDisplay extends JFrame {
                         t = t.replace(" " + id + " ", " (" + id + ") ");
                         t = t.replaceAll("  ", " / ");
                         d.setTitle(t);
-                        System.out.println("new title: " + title);
                     }
                 }
                 frame.getNewMSG().setText("");
-                System.out.println("-----------------");
             }
         }
         @Override
@@ -220,7 +187,6 @@ public class ChatDisplay extends JFrame {
                 i++;
             }
             int id = toNum(s.charAt(i));
-            System.out.println(id);
             if (isNum(s.charAt(i+1))) {
                 id = id*10 + toNum(s.charAt(i+1));
             }
@@ -237,10 +203,13 @@ public class ChatDisplay extends JFrame {
         }
         private int toNum(char c) {
             String nums = "0123456789";
-            int[] values = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+            ArrayList<Integer> values = new ArrayList<Integer>();
+            for (int i = 0; i < 10; i++) {
+                values.add(i);
+            }
             for (int i = 0; i < nums.length(); i++) {
                 if (c == nums.charAt(i)) {
-                    return values[i];
+                    return values.get(i);
                 }
             }
             return -1;
@@ -259,10 +228,9 @@ public class ChatDisplay extends JFrame {
             if (e.getKeyCode() == 10 && !newMsg.getText().equals("") && !newMsg.getText().contains("\n")) {
                 client.addSendMessageOnResponseCallback((a) -> {});
                 client.sendMessage(newMsg.getText(), "", chat.getChatID());
-                Message m = new Message(newMsg.getText(), person.getName(), "", frame.getChat().getChatID());
+                Message m = new Message(newMsg.getText(), person.getName(), frame.getChat().getChatID());
                 getExistingMsgs().setText(getExistingMsgs().getText() + frame.addMessage(m));
                 frame.getNewMSG().setText("");
-                System.out.println("sent");
             }
         }
         @Override
@@ -308,7 +276,6 @@ public class ChatDisplay extends JFrame {
         }
     }
     private void quit(ChatDisplay frame) {
-        System.out.println("quit out of chat");
         frame.setVisible(false);
         frame.getWindow().setVisible(true);
     }
@@ -335,7 +302,7 @@ public class ChatDisplay extends JFrame {
         messages.add(m);
         int i = messages.size() - 1;
         String result = "";
-        Message prevMessage = new Message("", "", "", -1);
+        Message prevMessage = new Message("", "", -1);
         String prevSender = "";
         if (i != 0) {
             prevMessage = messages.get(i - 1);
@@ -345,7 +312,6 @@ public class ChatDisplay extends JFrame {
         String content = currMessage.getContent();
         String sender = currMessage.getSender();
 
-        System.out.println((int)(font.getStringBounds(content, frc).getWidth()));
         if (!person.getName().equals(sender)) {
             if (!prevSender.equals(sender)) {
                 if (messages.indexOf(m) != 0) {
@@ -373,11 +339,10 @@ public class ChatDisplay extends JFrame {
                 result += splitMessage(content, HALFWAY_SPACE) + "\n";
             }
         }
-        System.out.println("<" + result + ">");
         return result;
     }
     private String splitMessage(String s, String spaceBefore) {
-        String[] words = s.split(" ");    //empty string for space
+        String[] words = s.split(" ");
         String result = spaceBefore;
         double lineLength = 0;
         for (String word : words) {
@@ -410,7 +375,6 @@ public class ChatDisplay extends JFrame {
                 result += "\n" + spaceBefore + word;
             }
         }
-        System.out.println("-----------------------");
         return result;
     }
    

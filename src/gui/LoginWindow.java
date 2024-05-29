@@ -67,7 +67,6 @@ public class LoginWindow extends JFrame {
         setTitle("WebChat");
         pack();
         setVisible(true);
-
         setDefaultCloseOperation(EXIT_ON_CLOSE);
     }
     
@@ -103,9 +102,7 @@ public class LoginWindow extends JFrame {
         client.addLoginOnResponseCallback((a) ->
         {
             String loginResult = a.getString("result");
-            System.out.println("login result: " + loginResult);
             if (loginResult.equals("SUCCESS")) {
-//                frame.setVisible(false);
                 frame.dispose();
                 new ChatsWindow(client, new Person(frame.getUserField().getText()));
             }
@@ -131,23 +128,19 @@ public class LoginWindow extends JFrame {
             for (char c : cList) {
                 p += c;
             }
+
             client.addLoginOnResponseCallback((a) -> {
                 String loginResult = a.getString("result");
-                System.out.println("login result: " + loginResult);
                 if (loginResult.equals("SUCCESS")) {
-//                    frame.setVisible(false);
                     frame.dispose();
                     Person person = new Person(u);
-                    System.out.println("ids when person is created: " + person.out());
                     client.addGetChatsOnResponseCallback((b) -> {
                         for (int i = 0; i < b.getJSONArray("chats").length(); i++) {
                             person.setChatID(b.getJSONArray("chats").getInt(i), i);
                         }
                         new ChatsWindow(client, person);
-                        System.out.println("ids while person is being created: " + person.out());
                     });
                     client.getChats();
-                    System.out.println("ids after person is created: " + person.out());
                 }
                 else {
                     JOptionPane loginPane = new JOptionPane("Login Fail");
@@ -188,7 +181,6 @@ public class LoginWindow extends JFrame {
                 client.addSignUpOnResponseCallback((a) ->
                 {
                     String result = a.getString("result");
-                    System.out.println("sign up result: " + result);
                     if (!result.equals("SUCCESS")) {
                         JOptionPane signUpFail = new JOptionPane("User Already Exists");
                         signUpFail.showMessageDialog(null, "User Already Exists");

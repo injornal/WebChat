@@ -1,9 +1,7 @@
 package gui.components;
 
-import org.json.JSONObject;
-
 /**
- * A message with its content, sender, timestamp, and chatID
+ * A message with its content, sender, and chatID
  * 
  * @author Chaitanya
  * @author Kostiantyn
@@ -13,7 +11,6 @@ import org.json.JSONObject;
 public class Message {
     private final String content;
     private final String sender;
-    private final String timeStamp;
     private final int chatId;
 
     /**
@@ -21,13 +18,11 @@ public class Message {
      * 
      * @param content   content of the message
      * @param sender    sender of the message
-     * @param timeStamp time at which the message was sent
      * @param chatId    chat the message will be sent to
      */
-    public Message(String content, String sender, String timeStamp, int chatId) {
+    public Message(String content, String sender, int chatId) {
         this.content = content;
         this.sender = sender;
-        this.timeStamp = timeStamp;
         this.chatId = chatId;
     }
     
@@ -48,23 +43,10 @@ public class Message {
     }
     
     /**
-     * Returns a messages timestamp
-     * @return timestamp
-     */
-    public String getTimeStamp() {
-        return timeStamp;
-    }
-    
-    /**
      * Returns the chat's id that the message was sent to
      * @return chatid
      */
     public int getChatID() {
         return chatId;
-    }
-    
-    
-    public void out() {
-        System.out.println("content: " + content + "\nsender: " + sender + "\nchatID: " + chatId);
     }
 }

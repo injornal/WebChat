@@ -1,5 +1,7 @@
 package gui.components;
 
+import java.util.ArrayList;
+
 import org.json.JSONArray;
 
 /**
@@ -13,9 +15,7 @@ import org.json.JSONArray;
 public class Person {
 
     private String name;
-    // private boolean loggedIn;
-    private int[] chatIDs;
-    // private Chat[] chats;
+    private ArrayList<Integer> chatIDs;
 
     /**
      * Creates a new person with their name
@@ -24,23 +24,11 @@ public class Person {
      */
     public Person(String name) {
         this.name = name;
-        // this.loggedIn = status;
-        chatIDs = new int[7];
-        for (int i = 0; i < chatIDs.length; i++) {
-            chatIDs[i] = -1;
+        chatIDs = new ArrayList<Integer>(7);
+        for (int i = 0; i < 7; i++) {
+            chatIDs.add(-1);
         }
     }
-    /*
-     * public boolean isLoggedIn(){
-     * return loggedIn;
-     * }
-     * public void active(){
-     * loggedIn = true;
-     * }
-     * public void inactive(){
-     * loggedIn = false;
-     * }
-     */
 
     /**
      * Sets the Person's chatIDs
@@ -49,7 +37,7 @@ public class Person {
      * @param index index that the id will be set at
      */
     public void setChatID(int id, int index) {
-        chatIDs[index] = id;
+        chatIDs.set(index, id);
     }
 
     /**
@@ -57,13 +45,13 @@ public class Person {
      * @param ids array of ids being set
      */
     public void setChatID(JSONArray ids) {
-        int[] newIDs = new int[7];
+        ArrayList<Integer> newIDs = new ArrayList<Integer>(7);
         for (int i = 0; i < 7; i++) {
             if (i < ids.length()) {
-                newIDs[i] = ids.getInt(i);
+                newIDs.add(ids.getInt(i));
             }
             else {
-                newIDs[i] = -1;
+                newIDs.add(-1);
             }
         }
         chatIDs = newIDs;
@@ -74,7 +62,7 @@ public class Person {
      * 
      * @return Array of chatIDs
      */
-    public int[] getChatIds() {
+    public ArrayList<Integer> getChatIds() {
         return chatIDs;
     }
 
@@ -94,15 +82,7 @@ public class Person {
      * @return chat index
      */
     public boolean exists(int index) {
-        return (chatIDs[index] != -1);
+        return (chatIDs.get(index) != -1);
     }
 
-    
-    public String out() {
-        String result = "";
-        for (int i : chatIDs) {
-            result += (i + " ");
-        } 
-        return result;
-    }
 }

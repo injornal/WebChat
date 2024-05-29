@@ -7,6 +7,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.util.ArrayList;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -18,8 +19,6 @@ import javax.swing.JTextField;
 import app.networking.Client;
 import gui.components.Chat;
 import gui.components.Person;
-
-import static java.lang.System.exit;
 
 /**
  * Displays the different clickable chats
@@ -33,8 +32,8 @@ public class ChatsWindow extends JFrame {
     
     private JPanel panel;
     private app.networking.Client client;
-    private JButton[] JButtons;
-    private ChatDisplay[] displays = new ChatDisplay[7];
+    private ArrayList<JButton> JButtons;
+    private ArrayList<ChatDisplay> displays = new ArrayList<ChatDisplay>(7);
     private Person person;
 
     /**
@@ -51,16 +50,19 @@ public class ChatsWindow extends JFrame {
         panel.setLayout(new GridLayout(2, 4));
         setMinimumSize(new Dimension(600, 300));
         setMaximumSize(new Dimension(600, 300));
-        JButtons = new JButton[7];
+        JButtons = new ArrayList<JButton>(7);
+        for (int i = 0; i < 7; i++) {
+            displays.add(null);
+        }
         for (int i = 0; i < 7; i++) {
             if (person.exists(i)) {
-                JButtons[i] = new JButton("" + person.getChatIds()[i]);
+                JButtons.add(new JButton("" + person.getChatIds().get(i)));
             }
             else {
-                JButtons[i] = new JButton("New Chat");
+                JButtons.add(new JButton("New Chat"));
             }
-            JButtons[i].addActionListener(new ClickChat(this, i));
-            panel.add(JButtons[i]);
+            JButtons.get(i).addActionListener(new ClickChat(this, i));
+            panel.add(JButtons.get(i));
         }
 
         JButton logout = new JButton("Logout");
@@ -71,7 +73,6 @@ public class ChatsWindow extends JFrame {
         setTitle("WebChat: " + person.getName());
         pack();
         setVisible(true);
-
         setDefaultCloseOperation(EXIT_ON_CLOSE);
     }
     
@@ -100,14 +101,14 @@ public class ChatsWindow extends JFrame {
      * Get Jbuttons
      * @return Array of Jbuttons
      */
-    public JButton[] getJButtons() {
+    public ArrayList<JButton> getJButtons() {
         return JButtons;
     }
     /**
      * Get displays
      * @return Array of displays
      */
-    public ChatDisplay[] getDisplays() {
+    public ArrayList<ChatDisplay> getDisplays() {
         return displays;
     }
 
@@ -121,11 +122,8 @@ public class ChatsWindow extends JFrame {
         }
 
         public void actionPerformed(ActionEvent e) {
-            System.out.println();
-            System.out.println("clicked");
             if (!frame.getPerson().exists(index)) {
                 JFrame clickChat = new JFrame();
-                System.out.println("new chat option");
                 clickChat.setMinimumSize(new Dimension(400, 50));
                 clickChat.setMaximumSize(new Dimension(400, 50));
                 JPanel textPanel = new JPanel();
@@ -139,12 +137,11 @@ public class ChatsWindow extends JFrame {
 
             }
             else {
-                System.out.println("alr a chat");
                 frame.setVisible(false);
                 client.addGetMessagesOnResponseCallback((a) -> {
-                    frame.getDisplays()[index] = new ChatDisplay(client, new Chat(index, a.getJSONArray("messages")), frame, person);
+                    frame.getDisplays().set(index, new ChatDisplay(client, new Chat(index, a.getJSONArray("messages")), frame, person));
                 });
-                client.getMessages(frame.getPerson().getChatIds()[index]);
+                client.getMessages(frame.getPerson().getChatIds().get(index));
             }
         }
     }
@@ -154,12 +151,16 @@ public class ChatsWindow extends JFrame {
         private JTextField input;
         private int index;
         private final String nums = "0123456789";
-        private final int[] numList = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+        private ArrayList<Integer> numList;
         public InputDetector(ChatsWindow frame, JFrame inputFrame, JTextField input, int index) {
             this.frame = frame;
             this.inputFrame = inputFrame;
             this.input = input;
             this.index = index;
+            numList = new ArrayList<Integer>();
+            for (int i = 0; i < 10; i++) {
+                numList.add(i);
+            }
         }
         @Override
         public void keyTyped(KeyEvent e) {
@@ -171,56 +172,38 @@ public class ChatsWindow extends JFrame {
         public void keyReleased(KeyEvent e) {
             if (e.getKeyCode() == 10) {
                 if (input.getText().equals("")) {
-                    System.out.println("empty chat");
                     Chat chat = new Chat(-1);
-                    client.addCreateChatOnResponseCallback((a) ->
-                    {
+                    client.addCreateChatOnResponseCallback((a) -> {
                         int id = a.getInt("chat_id");
-                        System.out.println("id: " + id);
                         person.setChatID(id, index);
                         chat.setChatID(id);
-                        frame.getJButtons()[index] = new JButton("" + id);
-                        frame.getJButtons()[index].addActionListener(new ClickChat(frame, index));
+                        frame.getJButtons().set(index, new JButton("" + id));
+                        frame.getJButtons().get(index).addActionListener(new ClickChat(frame, index));
 
-                        frame.getDisplays()[index] = new ChatDisplay(client, chat, frame, person);
+                        frame.getDisplays().set(index, new ChatDisplay(client, chat, frame, person));
                         frame.setVisible(false);
                         JPanel panel = frame.getPanel();
                         panel.remove(index);
-                        panel.add(frame.getJButtons()[index], index);
-                        System.out.print("ids: ");
-                        for (int chatID : person.getChatIds()) {
-                            System.out.print(chatID + " ");
-                        }
-                        System.out.println();
+                        panel.add(frame.getJButtons().get(index), index);
                     });
                     client.createChat();
                 }
                 else if (isNum(input.getText())) {
-                    System.out.println("join chat");
                     int id = toNum(input.getText());
                     client.addJoinChatOnResponseCallback((b) -> {
                         if (b.getString("result").equals("SUCCESS")) {
-                            System.out.println("success");
                             Chat chat = new Chat(id);
-                            System.out.println("id: " + id);
                             person.setChatID(id, index);
-                            frame.getJButtons()[index] = new JButton("" + id);
-                            frame.getJButtons()[index].addActionListener(new ClickChat(frame, index));
+                            frame.getJButtons().set(index, new JButton("" + id));
+                            frame.getJButtons().get(index).addActionListener(new ClickChat(frame, index));
 
-                            frame.getDisplays()[index] = new ChatDisplay(client, chat, frame, person);
-                            //retrieve messages
+                            frame.getDisplays().set(index, new ChatDisplay(client, chat, frame, person));
                             frame.setVisible(false);
                             JPanel panel = frame.getPanel();
                             panel.remove(index);
-                            panel.add(frame.getJButtons()[index], index);
-                            System.out.print("ids: ");
-                            for (int ids : person.getChatIds()) {
-                                System.out.print(ids + " ");
-                            }
-                            System.out.println();
+                            panel.add(frame.getJButtons().get(index), index);
                         }
                         else {
-                            System.out.println("fail");
                             JOptionPane loginPane = new JOptionPane("Join Fail");
                             loginPane.showMessageDialog(null, "Join Fail");
                             loginPane.setBorder(BorderFactory.createEmptyBorder(30,30,10,30));
@@ -229,7 +212,6 @@ public class ChatsWindow extends JFrame {
                     client.joinChat(id);
                 }
                 else {
-                    System.out.println("fail");
                     JOptionPane loginPane = new JOptionPane("Join Fail");
                     loginPane.showMessageDialog(null, "Join Fail");
                     loginPane.setBorder(BorderFactory.createEmptyBorder(30,30,10,30));
@@ -248,7 +230,7 @@ public class ChatsWindow extends JFrame {
         private int toNum(String s) {
             int result = 0;
             for (int i = 0; i < s.length(); i++) {
-                result += numList[nums.indexOf(s.charAt(i))] * (int)Math.pow(10, i);
+                result += numList.get(nums.indexOf(s.charAt(i))) * (int)Math.pow(10, i);
             }
             return result;
         }
@@ -264,7 +246,6 @@ public class ChatsWindow extends JFrame {
 
         public void actionPerformed(ActionEvent e) {
             frame.dispose();
-            System.out.println("logged out");
             new LoginWindow(this.client);
         }
     }
