@@ -45,13 +45,17 @@ public class Person {
     /**
      * Sets the Person's chatIDs
      * 
-     * @param IDs ids
+     * @param id ids
      * @param index index that the id will be set at
      */
     public void setChatID(int id, int index) {
         chatIDs[index] = id;
     }
 
+    /**
+     * Set chat ids
+     * @param ids array of ids being set
+     */
     public void setChatID(JSONArray ids) {
         int[] newIDs = new int[7];
         for (int i = 0; i < 7; i++) {
