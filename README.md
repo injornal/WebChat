@@ -10,6 +10,8 @@ Both the server and the client applications are completely asynchronous and thre
 The client side is based on the publish-subscribe pattern thus guaranteeing proper callback flow.
 Uses a JSON-driven API.
 
+![app preview](./docs/preview.png "app preview")
+
 ## User guide
 Upon downloading, compile and run src/server/Server.java from inside the src folder:
 `javac -cp .:json-20140107.jar server/Server.java; java -cp .:json-20140107 server.Server`
@@ -21,5 +23,3 @@ After creating an account, you can create a new chat by pressing `Create Chat` a
 Others can join by pressing `Create Chat` and entering the chat ID which can be seen on top of the opened chat. 
 
 The application also supports shortcuts. For example, you can use numbers to swap between open chats.
-
-![alt text]()
