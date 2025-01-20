@@ -21,3 +21,5 @@ After creating an account, you can create a new chat by pressing `Create Chat` a
 Others can join by pressing `Create Chat` and entering the chat ID which can be seen on top of the opened chat. 
 
 The application also supports shortcuts. For example, you can use numbers to swap between open chats.
+
+![alt text]()
