@@ -1,1 +1,2 @@
-Main-Class: App
+Main-Class: app.App
+Class-Path: lib/json-20140107.jar
