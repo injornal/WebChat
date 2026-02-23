@@ -1,2 +1,5 @@
 # Auto detect text files and perform LF normalization
 * text=auto
+# Ignore generated Javadoc
+app/docs/** linguist-generated=true
+server/docs/** linguist-generated=true
