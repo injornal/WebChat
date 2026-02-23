@@ -10,8 +10,6 @@ Both the server and the client applications are completely asynchronous and thre
 The client side is based on the publish-subscribe pattern, guaranteeing proper callback flow.
 Uses a JSON-driven API.
 
-![app preview](./preview/preview.png "app preview")
-
 ## User guide
 The server is dockerized and can be run with docker compose. To start the server from the root, run 
 ``` console
@@ -29,3 +27,6 @@ After creating an account, you can create a new chat by pressing `Create Chat` a
 Others can join by pressing `Create Chat` and entering the chat ID which can be seen on top of the opened chat. 
 
 The application also supports shortcuts. For example, you can use numbers to swap between open chats.
+
+## Showcase 
+![app preview](./preview/preview.png "app preview")
